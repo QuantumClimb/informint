@@ -1,9 +1,17 @@
+// Get the base URL for API calls
+function getBaseUrl() {
+  // If we're on localhost, use localhost, otherwise use the current domain
+  return window.location.hostname === 'localhost' 
+    ? 'http://localhost:3000' 
+    : window.location.origin;
+}
+
 async function loadDashboardData() {
   const container = document.getElementById('resultsGrid');
   container.innerHTML = 'Loading...';
 
   try {
-    const res = await fetch('http://localhost:3000/data.json');
+    const res = await fetch(`${getBaseUrl()}/data.json`);
     const data = await res.json();
 
     container.innerHTML = ''; // clear loading
@@ -143,7 +151,7 @@ async function loadScrapesList() {
   container.innerHTML = 'Loading scrapes...';
 
   try {
-    const res = await fetch('http://localhost:3000/api/scrapes');
+    const res = await fetch(`${getBaseUrl()}/api/scrapes`);
     const scrapes = await res.json();
 
     if (scrapes.length === 0) {
@@ -178,7 +186,7 @@ async function deleteScrape(filename) {
   }
 
   try {
-    const res = await fetch(`http://localhost:3000/api/scrapes/${filename}`, {
+    const res = await fetch(`${getBaseUrl()}/api/scrapes/${filename}`, {
       method: 'DELETE'
     });
 
@@ -197,7 +205,7 @@ async function deleteScrape(filename) {
 
 function downloadCSV() {
   // Download combined CSV from all scrapes
-  fetch('http://localhost:3000/data.json')
+  fetch(`${getBaseUrl()}/data.json`)
     .then(res => res.json())
     .then(data => {
       if (data.length === 0) {
@@ -215,7 +223,7 @@ function downloadCSV() {
 
 function downloadScrapeCSV(filename) {
   // Download CSV for individual scrape
-  fetch(`http://localhost:3000/api/scrapes/${filename}`)
+  fetch(`${getBaseUrl()}/api/scrapes/${filename}`)
     .then(res => res.json())
     .then(data => {
       if (data.length === 0) {
@@ -334,7 +342,7 @@ function purgeAllScrapes() {
     return;
   }
 
-  fetch('http://localhost:3000/api/scrapes', {
+  fetch(`${getBaseUrl()}/api/scrapes`, {
     method: 'DELETE'
   })
     .then(res => res.json())

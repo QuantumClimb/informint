@@ -93,6 +93,14 @@
   </footer>
 
   <script>
+    // Get the base URL for API calls
+    function getBaseUrl() {
+      // If we're on localhost, use localhost, otherwise use the current domain
+      return window.location.hostname === 'localhost' 
+        ? 'http://localhost:3000' 
+        : window.location.origin;
+    }
+
     // Add URL input functionality
     document.getElementById('addUrlBtn').addEventListener('click', function() {
       addUrlInput();
@@ -145,7 +153,7 @@
           const url = urls[i];
           submitBtn.textContent = `Scraping ${i + 1}/${urls.length}...`;
           
-          const res = await fetch(`http://localhost:3000/api/scrape?url=${encodeURIComponent(url)}`);
+          const res = await fetch(`${getBaseUrl()}/api/scrape?url=${encodeURIComponent(url)}`);
           const data = await res.json();
 
           if (res.ok) {
