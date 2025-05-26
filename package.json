@@ -1,0 +1,20 @@
+{
+  "name": "informint",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Informint - Fresh Data. Real Influence. Instagram analytics and scraping tool.",
+  "dependencies": {
+    "apify-client": "^2.12.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0"
+  }
+}

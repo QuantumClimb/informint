@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Instagram Scraper - Informint</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="logo">Informint</a>
+      <nav class="nav">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="scrape.html" class="active">Scrape</a></li>
+          <li><a href="dashboard.html">Dashboard</a></li>
+          <li><a href="pricing.html">Pricing</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="scrape-input-section">
+      <div class="container">
+        <h1>Instagram Post Scraper</h1>
+        <p>Enter Instagram post URLs below to extract data</p>
+
+        <form id="scrapeForm">
+          <label>Instagram URLs:</label>
+          <div id="urlInputs">
+            <div class="url-input-group">
+              <input type="url" class="url-input" placeholder="https://www.instagram.com/p/example1" required>
+              <button type="button" class="btn-remove" onclick="removeUrlInput(this)">×</button>
+            </div>
+          </div>
+          <button type="button" id="addUrlBtn" class="btn btn-outline">+ Add Another URL</button>
+          <button type="submit" class="btn btn-primary">Run Scrape</button>
+        </form>
+
+        <div class="scrape-tips">
+          <ul>
+            <li>✅ Posts must be public</li>
+            <li>✅ Use direct post or reel links (not profile URLs)</li>
+            <li>✅ 1 scrape/day (up to 10 URLs) on free plan</li>
+            <li>🚀 Upgrade to Pro for bulk scraping</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h4>Informint</h4>
+          <p>Fresh Data. Real Influence. The ultimate tool for Instagram campaign analytics and reporting.</p>
+        </div>
+        <div>
+          <h4>Product</h4>
+          <ul>
+            <li><a href="scrape.html">Scrape</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="pricing.html">Pricing</a></li>
+            <li><a href="#">Features</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Contact</a></li>
+            <li><a href="#">Careers</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="#">Terms</a></li>
+            <li><a href="#">Privacy</a></li>
+            <li><a href="#">Cookies</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="footer-copy">&copy; 2025 Informint. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Add URL input functionality
+    document.getElementById('addUrlBtn').addEventListener('click', function() {
+      addUrlInput();
+    });
+
+    function addUrlInput() {
+      const urlInputs = document.getElementById('urlInputs');
+      const newGroup = document.createElement('div');
+      newGroup.className = 'url-input-group';
+      newGroup.innerHTML = `
+        <input type="url" class="url-input" placeholder="https://www.instagram.com/p/example" required>
+        <button type="button" class="btn-remove" onclick="removeUrlInput(this)">×</button>
+      `;
+      urlInputs.appendChild(newGroup);
+    }
+
+    function removeUrlInput(button) {
+      const urlInputs = document.getElementById('urlInputs');
+      if (urlInputs.children.length > 1) {
+        button.parentElement.remove();
+      } else {
+        alert("You must have at least one URL input.");
+      }
+    }
+
+    // Handle form submission
+    document.getElementById('scrapeForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const urlInputs = document.querySelectorAll('.url-input');
+      const urls = Array.from(urlInputs)
+        .map(input => input.value.trim())
+        .filter(Boolean);
+
+      if (urls.length === 0) {
+        alert("Please enter at least one Instagram URL.");
+        return;
+      }
+
+      // Show loading state
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Scraping...';
+      submitBtn.disabled = true;
+
+      try {
+        // Scrape each URL individually
+        const results = [];
+        for (let i = 0; i < urls.length; i++) {
+          const url = urls[i];
+          submitBtn.textContent = `Scraping ${i + 1}/${urls.length}...`;
+          
+          const res = await fetch(`http://localhost:3000/api/scrape?url=${encodeURIComponent(url)}`);
+          const data = await res.json();
+
+          if (res.ok) {
+            results.push(...data);
+            console.log(`✅ Scrape ${i + 1} success:`, data.length, "posts");
+          } else {
+            console.error(`❌ Scrape ${i + 1} failed:`, data.error);
+            alert(`❌ Scrape failed for URL ${i + 1}: ${data.error || "Unknown error"}`);
+          }
+        }
+
+        if (results.length > 0) {
+          console.log("✅ All scrapes completed:", results.length, "total posts");
+          window.location.href = 'dashboard.html';
+        }
+      } catch (err) {
+        console.error(err);
+        alert("❌ Something went wrong. Check the browser console.");
+      } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
