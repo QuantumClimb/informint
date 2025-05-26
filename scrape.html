@@ -46,8 +46,9 @@
           <ul>
             <li>✅ Posts must be public</li>
             <li>✅ Use direct post or reel links (not profile URLs)</li>
-            <li>✅ 1 scrape/day (up to 10 URLs) on free plan</li>
-            <li>🚀 Upgrade to Pro for bulk scraping</li>
+            <li>⚠️ Maximum 3 URLs per scrape</li>
+            <li>🗑️ New scrapes will purge existing data</li>
+            <li>📥 Download CSV before starting new scrape</li>
           </ul>
         </div>
       </div>
@@ -101,13 +102,38 @@
         : window.location.origin;
     }
 
+    // Check if there's existing scrape data
+    async function checkForExistingData() {
+      try {
+        const res = await fetch(`${getBaseUrl()}/api/scrapes`);
+        const scrapes = await res.json();
+        return scrapes.length > 0;
+      } catch (err) {
+        console.error('Error checking existing data:', err);
+        return false;
+      }
+    }
+
     // Add URL input functionality
     document.getElementById('addUrlBtn').addEventListener('click', function() {
       addUrlInput();
     });
 
+    // Initialize button text on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      updateAddButtonText();
+    });
+
     function addUrlInput() {
       const urlInputs = document.getElementById('urlInputs');
+      const currentCount = urlInputs.children.length;
+      
+      // Limit to 3 URLs maximum
+      if (currentCount >= 3) {
+        alert('⚠️ Maximum 3 URLs allowed per scrape. Please remove a URL first or start a new scrape.');
+        return;
+      }
+      
       const newGroup = document.createElement('div');
       newGroup.className = 'url-input-group';
       newGroup.innerHTML = `
@@ -115,14 +141,35 @@
         <button type="button" class="btn-remove" onclick="removeUrlInput(this)">×</button>
       `;
       urlInputs.appendChild(newGroup);
+      
+      // Update the add button text to show remaining slots
+      updateAddButtonText();
     }
 
     function removeUrlInput(button) {
       const urlInputs = document.getElementById('urlInputs');
       if (urlInputs.children.length > 1) {
         button.parentElement.remove();
+        updateAddButtonText();
       } else {
         alert("You must have at least one URL input.");
+      }
+    }
+
+    function updateAddButtonText() {
+      const urlInputs = document.getElementById('urlInputs');
+      const currentCount = urlInputs.children.length;
+      const addBtn = document.getElementById('addUrlBtn');
+      
+      if (currentCount >= 3) {
+        addBtn.textContent = '🚫 Maximum 3 URLs reached';
+        addBtn.disabled = true;
+        addBtn.classList.add('btn-disabled');
+      } else {
+        const remaining = 3 - currentCount;
+        addBtn.textContent = `+ Add Another URL (${remaining} remaining)`;
+        addBtn.disabled = false;
+        addBtn.classList.remove('btn-disabled');
       }
     }
 
@@ -140,6 +187,11 @@
         return;
       }
 
+      if (urls.length > 3) {
+        alert("⚠️ Maximum 3 URLs allowed per scrape. Please remove some URLs.");
+        return;
+      }
+
       // Show loading state
       const submitBtn = e.target.querySelector('button[type="submit"]');
       const originalText = submitBtn.textContent;
@@ -147,6 +199,23 @@
       submitBtn.disabled = true;
 
       try {
+        // Check if there's existing data and warn user
+        const hasExistingData = await checkForExistingData();
+        if (hasExistingData) {
+          const proceed = confirm(
+            '⚠️ IMPORTANT: Starting a new scrape will PURGE all existing data!\n\n' +
+            '📥 Please download your current CSV data from the Dashboard before proceeding.\n\n' +
+            '🗑️ All previous scrapes will be permanently deleted.\n\n' +
+            'Do you want to continue and delete all existing data?'
+          );
+          
+          if (!proceed) {
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+            return;
+          }
+        }
+
         // Scrape each URL individually
         const results = [];
         for (let i = 0; i < urls.length; i++) {

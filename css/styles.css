@@ -930,6 +930,20 @@ details[open] summary {
   }
 }
 
+/* Disabled button styles */
+.btn-disabled {
+  background: #ccc !important;
+  color: #666 !important;
+  cursor: not-allowed !important;
+  border-color: #ccc !important;
+}
+
+.btn-disabled:hover {
+  background: #ccc !important;
+  color: #666 !important;
+  transform: none !important;
+}
+
 @media (max-width: 600px) {
   .container {
     padding: 1rem 0;
