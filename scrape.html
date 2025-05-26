@@ -21,6 +21,11 @@
           <li><a href="pricing.html">Pricing</a></li>
         </ul>
       </nav>
+      <div class="actions">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+          🌙
+        </button>
+      </div>
     </div>
   </header>
 
@@ -94,6 +99,34 @@
   </footer>
 
   <script>
+    // Theme Management
+    function initTheme() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      const themeToggle = document.getElementById('themeToggle');
+      
+      // Apply saved theme
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      updateThemeIcon(savedTheme);
+      
+      // Theme toggle event listener
+      themeToggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+      });
+    }
+    
+    function updateThemeIcon(theme) {
+      const themeToggle = document.getElementById('themeToggle');
+      themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+    }
+    
+    // Initialize theme on page load
+    document.addEventListener('DOMContentLoaded', initTheme);
+
     // Get the base URL for API calls
     function getBaseUrl() {
       // If we're on localhost, use localhost, otherwise use the current domain
