@@ -56,7 +56,15 @@ module.exports = {
     defaultSortOrder: 'newest', // 'newest', 'oldest', 'most_liked'
     
     // Export settings
-    csvHeaders: ['Username', 'Caption', 'Likes', 'Comments', 'Views', 'Date', 'URL'],
+    csvHeaders: [
+      'Post ID', 'Short Code', 'Type', 'Username', 'Owner Full Name', 'Owner ID', 'Is Verified',
+      'Caption', 'Hashtags', 'Mentions', 'Likes', 'Comments Count', 'Video Views', 'Video Plays',
+      'Date Posted', 'Input URL', 'Post URL', 'Video URL', 'Display Image URL',
+      'Video Duration', 'Dimensions (W x H)', 'Location Name', 'Location ID',
+      'Is Sponsored', 'Product Type', 'Comments Disabled', 'First Comment',
+      'Music Artist', 'Song Name', 'Uses Original Audio', 'Audio ID',
+      'Tagged Users', 'Co-author Producers', 'All Comments', 'Top Comment Likes'
+    ],
     dateFormat: 'YYYY-MM-DD HH:mm:ss'
   },
 

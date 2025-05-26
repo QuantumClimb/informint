@@ -233,23 +233,92 @@ function downloadScrapeCSV(filename) {
 }
 
 function downloadDataAsCSV(data, filename) {
-  // Create CSV content
-  const headers = ['Username', 'Caption', 'Likes', 'Comments', 'Views', 'Date', 'URL'];
+  // Create comprehensive CSV content with all available fields
+  const headers = [
+    'Post ID', 'Short Code', 'Type', 'Username', 'Owner Full Name', 'Owner ID', 'Is Verified',
+    'Caption', 'Hashtags', 'Mentions', 'Likes', 'Comments Count', 'Video Views', 'Video Plays',
+    'Date Posted', 'Input URL', 'Post URL', 'Video URL', 'Display Image URL',
+    'Video Duration', 'Dimensions (W x H)', 'Location Name', 'Location ID',
+    'Is Sponsored', 'Product Type', 'Comments Disabled', 'First Comment',
+    'Music Artist', 'Song Name', 'Uses Original Audio', 'Audio ID',
+    'Tagged Users', 'Co-author Producers', 'All Comments', 'Top Comment Likes'
+  ];
+
   const csvContent = [
     headers.join(','),
-    ...data.map(post => [
-      `"${post.ownerUsername || ''}"`,
-      `"${(post.caption || '').replace(/"/g, '""')}"`,
-      post.likesCount || 0,
-      post.commentsCount || 0,
-      post.videoViewCount || 0,
-      `"${new Date(post.timestamp).toLocaleDateString()}"`,
-      `"${post.inputUrl || post.url || ''}"`
-    ].join(','))
+    ...data.map(post => {
+      // Process hashtags
+      const hashtags = (post.hashtags || []).join('; ');
+      
+      // Process mentions
+      const mentions = (post.mentions || []).join('; ');
+      
+      // Process tagged users
+      const taggedUsers = (post.taggedUsers || []).map(user => 
+        `${user.username} (${user.full_name})`
+      ).join('; ');
+      
+      // Process co-authors
+      const coAuthors = (post.coauthorProducers || []).map(user => 
+        user.username
+      ).join('; ');
+      
+      // Process all comments (limit to prevent CSV bloat)
+      const allComments = (post.latestComments || []).slice(0, 10).map(comment => 
+        `${comment.ownerUsername}: ${comment.text.replace(/"/g, '""').replace(/\n/g, ' ')}`
+      ).join(' | ');
+      
+      // Get top comment likes
+      const topCommentLikes = Math.max(...(post.latestComments || []).map(c => c.likesCount || 0), 0);
+      
+      // Music info
+      const musicArtist = post.musicInfo?.artist_name || '';
+      const songName = post.musicInfo?.song_name || '';
+      const usesOriginalAudio = post.musicInfo?.uses_original_audio || false;
+      const audioId = post.musicInfo?.audio_id || '';
+      
+      return [
+        `"${post.id || ''}"`,
+        `"${post.shortCode || ''}"`,
+        `"${post.type || ''}"`,
+        `"${post.ownerUsername || ''}"`,
+        `"${post.ownerFullName || ''}"`,
+        `"${post.ownerId || ''}"`,
+        `"${post.owner?.is_verified || false}"`,
+        `"${(post.caption || '').replace(/"/g, '""').replace(/\n/g, ' ')}"`,
+        `"${hashtags}"`,
+        `"${mentions}"`,
+        post.likesCount || 0,
+        post.commentsCount || 0,
+        post.videoViewCount || 0,
+        post.videoPlayCount || 0,
+        `"${new Date(post.timestamp).toLocaleString()}"`,
+        `"${post.inputUrl || ''}"`,
+        `"${post.url || ''}"`,
+        `"${post.videoUrl || ''}"`,
+        `"${post.displayUrl || ''}"`,
+        post.videoDuration || 0,
+        `"${post.dimensionsWidth || 0} x ${post.dimensionsHeight || 0}"`,
+        `"${post.locationName || ''}"`,
+        `"${post.locationId || ''}"`,
+        `"${post.isSponsored || false}"`,
+        `"${post.productType || ''}"`,
+        `"${post.isCommentsDisabled || false}"`,
+        `"${(post.firstComment || '').replace(/"/g, '""')}"`,
+        `"${musicArtist}"`,
+        `"${songName}"`,
+        `"${usesOriginalAudio}"`,
+        `"${audioId}"`,
+        `"${taggedUsers}"`,
+        `"${coAuthors}"`,
+        `"${allComments}"`,
+        topCommentLikes
+      ].join(',');
+    })
   ].join('\n');
 
   // Download CSV
-  const blob = new Blob([csvContent], { type: 'text/csv' });
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
