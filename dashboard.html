@@ -4,16 +4,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - Informint</title>
+  <title>Analytics Dashboard - Informint</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <header class="site-header">
     <div class="container">
-      <a href="index.html" class="logo">Informint</a>
+      <a href="index.html" class="logo">
+        <img src="public/logo.png" alt="Informint - Instagram Analytics Platform" class="logo-image">
+        <span class="logo-text">Informint</span>
+      </a>
       <nav class="nav">
         <ul>
           <li><a href="index.html">Home</a></li>
@@ -27,19 +31,126 @@
           🌙
         </button>
       </div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle mobile menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
     </div>
   </header>
 
+  <!-- Mobile Navigation -->
+  <nav class="mobile-nav" id="mobileNav">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="scrape.html">Scrape</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="pricing.html">Pricing</a></li>
+    </ul>
+    <div class="mobile-actions">
+      <button class="theme-toggle" id="mobileThemeToggle" aria-label="Toggle dark mode">
+        🌙 Dark Mode
+      </button>
+    </div>
+  </nav>
+
   <main>
+    <!-- Hero -->
+    <section class="hero hero-compact">
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-text">
+            <h1>Analytics <span class="highlight">Dashboard</span></h1>
+            <p>Comprehensive Instagram analytics with real-time insights, creator intelligence, and performance metrics. Monitor engagement rates, track viral content, and discover top-performing creators with our advanced analytics engine.</p>
+            <div class="hero-cta">
+              <button class="btn btn-primary" onclick="toggleView('analytics')">View Analytics</button>
+              <button class="btn btn-outline" onclick="navigateToNewScrape()">New Scrape</button>
+            </div>
+          </div>
+          <div class="hero-image">
+            <img src="public/dash_banner.png" alt="Instagram Analytics Dashboard Interface" class="banner-image banner-image-small">
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="dashboard-header">
       <div class="container">
-        <h1>Scrape Results</h1>
         <div class="dashboard-actions">
-          <button class="btn btn-outline" onclick="window.location.href='scrape.html'">New Scrape</button>
+          <button class="btn btn-outline" onclick="navigateToNewScrape()">New Scrape</button>
           <button class="btn btn-outline" onclick="refreshDashboard()">Refresh</button>
+          <button class="btn btn-outline" onclick="toggleView('data')">View Data</button>
+          <button class="btn btn-outline" onclick="toggleView('analytics')">Analytics</button>
           <button class="btn btn-outline" onclick="toggleScrapeManager()">Manage Scrapes</button>
           <button class="btn btn-primary" onclick="downloadCSV()">Download All CSV</button>
           <button class="btn btn-danger" onclick="purgeAllScrapes()">Purge All</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Analytics Overview Section -->
+    <section class="analytics-overview" id="analyticsOverview" style="display: block;">
+      <div class="container">
+        <div class="analytics-grid">
+          <!-- KPI Cards -->
+          <div class="kpi-cards">
+            <div class="kpi-card">
+              <div class="kpi-icon">📊</div>
+              <div class="kpi-content">
+                <h3 id="totalPosts">-</h3>
+                <p>Total Posts</p>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-icon">👥</div>
+              <div class="kpi-content">
+                <h3 id="totalCreators">-</h3>
+                <p>Creators</p>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-icon">💯</div>
+              <div class="kpi-content">
+                <h3 id="avgEngagement">-</h3>
+                <p>Avg Engagement Rate</p>
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-icon">🎯</div>
+              <div class="kpi-content">
+                <h3 id="avgPerformance">-</h3>
+                <p>Avg Performance Score</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Section -->
+          <div class="charts-section">
+            <div class="chart-container">
+              <h3>Performance Distribution</h3>
+              <canvas id="performanceChart"></canvas>
+            </div>
+            <div class="chart-container">
+              <h3>Engagement Rate by Creator</h3>
+              <canvas id="engagementChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Creator Performance Matrix -->
+          <div class="creator-matrix">
+            <h3>Top Performing Creators</h3>
+            <div id="creatorsList">
+              <!-- Dynamic creator performance data -->
+            </div>
+          </div>
+
+          <!-- Insights Section -->
+          <div class="insights-section">
+            <h3>📈 Analytics Insights</h3>
+            <div id="insightsList">
+              <!-- Dynamic insights -->
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -53,9 +164,12 @@
       </div>
     </section>
 
-    <section class="results-section">
-      <div class="container results-grid" id="resultsGrid">
-        <!-- Dynamic results injected via JS -->
+    <section class="results-section" id="dataView" style="display: none;">
+      <div class="container">
+        <h2>Scraped Data</h2>
+        <div class="results-grid" id="resultsGrid">
+          <!-- Dynamic results injected via JS -->
+        </div>
       </div>
     </section>
   </main>
@@ -64,8 +178,11 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <h4>Informint</h4>
-          <p>Fresh Data. Real Influence. The ultimate tool for Instagram campaign analytics and reporting.</p>
+          <div class="footer-logo">
+            <img src="public/logo.png" alt="Informint Logo" class="footer-logo-image">
+            <h4>Informint</h4>
+          </div>
+          <p>Professional Instagram Analytics & Data Intelligence Platform. Empowering marketers, creators, and agencies with actionable social media insights and comprehensive influencer intelligence.</p>
         </div>
         <div>
           <h4>Product</h4>
@@ -94,7 +211,13 @@
           </ul>
         </div>
       </div>
-      <p class="footer-copy">&copy; 2025 Informint. All rights reserved.</p>
+      <div class="footer-bottom">
+        <p class="footer-copy">&copy; 2025 Informint. All rights reserved.</p>
+        <div class="powered-by">
+          <span>Powered by</span>
+          <img src="public/qc.png" alt="Quantm Climb" class="qc-logo">
+        </div>
+      </div>
     </div>
   </footer>
 
@@ -103,29 +226,73 @@
     function initTheme() {
       const savedTheme = localStorage.getItem('theme') || 'light';
       const themeToggle = document.getElementById('themeToggle');
+      const mobileThemeToggle = document.getElementById('mobileThemeToggle');
       
       // Apply saved theme
       document.documentElement.setAttribute('data-theme', savedTheme);
       updateThemeIcon(savedTheme);
       
-      // Theme toggle event listener
-      themeToggle.addEventListener('click', () => {
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-        updateThemeIcon(newTheme);
+      // Theme toggle event listeners
+      [themeToggle, mobileThemeToggle].forEach(toggle => {
+        if (toggle) {
+          toggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+          });
+        }
       });
     }
     
     function updateThemeIcon(theme) {
       const themeToggle = document.getElementById('themeToggle');
-      themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+      const mobileThemeToggle = document.getElementById('mobileThemeToggle');
+      
+      if (themeToggle) themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+      if (mobileThemeToggle) mobileThemeToggle.textContent = theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+    }
+
+    // Mobile Menu Management
+    function initMobileMenu() {
+      const hamburger = document.getElementById('hamburger');
+      const mobileNav = document.getElementById('mobileNav');
+      
+      if (hamburger && mobileNav) {
+        hamburger.addEventListener('click', () => {
+          hamburger.classList.toggle('active');
+          mobileNav.classList.toggle('active');
+          document.body.style.overflow = mobileNav.classList.contains('active') ? 'hidden' : '';
+        });
+
+        // Close mobile menu when clicking on links
+        const mobileLinks = mobileNav.querySelectorAll('a');
+        mobileLinks.forEach(link => {
+          link.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            mobileNav.classList.remove('active');
+            document.body.style.overflow = '';
+          });
+        });
+
+        // Close mobile menu when clicking outside
+        mobileNav.addEventListener('click', (e) => {
+          if (e.target === mobileNav) {
+            hamburger.classList.remove('active');
+            mobileNav.classList.remove('active');
+            document.body.style.overflow = '';
+          }
+        });
+      }
     }
     
-    // Initialize theme on page load
-    document.addEventListener('DOMContentLoaded', initTheme);
+    // Initialize theme and mobile menu on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      initMobileMenu();
+    });
   </script>
   <script src="dashboard.js"></script>
 </body>

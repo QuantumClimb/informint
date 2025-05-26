@@ -1,3 +1,8 @@
+// Global variables
+let performanceChart = null;
+let engagementChart = null;
+let currentView = 'analytics';
+
 // Get the base URL for API calls
 function getBaseUrl() {
   // If we're on localhost, use localhost, otherwise use the current domain
@@ -54,7 +59,8 @@ async function loadDashboardData() {
             : `<img src="${displayUrl}" class="post-thumbnail" alt="Post image"/>`}
         </div>
         <div class="post-meta">
-          <h3>@${ownerUsername}</h3>
+          <h3>@${ownerUsername} ${post.ownerIsVerified ? '✓' : ''}</h3>
+          ${post.ownerFollowersCount ? `<p class="followers"><strong>👥 ${post.ownerFollowersCount.toLocaleString()} followers</strong></p>` : ''}
           <p class="caption">${caption || '(No caption)'}</p>
           <ul class="stats">
             <li><strong>Views:</strong> <span>${videoViewCount?.toLocaleString() || 'N/A'}</span></li>
@@ -244,8 +250,9 @@ function downloadDataAsCSV(data, filename) {
   // Create comprehensive CSV content with all available fields
   const headers = [
     'Post ID', 'Short Code', 'Type', 'Username', 'Owner Full Name', 'Owner ID', 'Is Verified',
+    'Followers Count', 'Following Count', 'Posts Count', 'Biography', 'External URL', 'Is Business Account', 'Account Category',
     'Caption', 'Hashtags', 'Mentions', 'Likes', 'Comments Count', 'Video Views', 'Video Plays',
-    'Date Posted', 'Input URL', 'Post URL', 'Video URL', 'Display Image URL',
+    'Date Posted', 'Input URL', 'Post URL', 'Video URL', 'Display Image URL', 'Profile Pic HD',
     'Video Duration', 'Dimensions (W x H)', 'Location Name', 'Location ID',
     'Is Sponsored', 'Product Type', 'Comments Disabled', 'First Comment',
     'Music Artist', 'Song Name', 'Uses Original Audio', 'Audio ID',
@@ -273,11 +280,12 @@ function downloadDataAsCSV(data, filename) {
       
       // Process all comments (limit to prevent CSV bloat)
       const allComments = (post.latestComments || []).slice(0, 10).map(comment => 
-        `${comment.ownerUsername}: ${comment.text.replace(/"/g, '""').replace(/\n/g, ' ')}`
+        `${comment.ownerUsername || 'Unknown'}: ${(comment.text || '').replace(/"/g, '""').replace(/\n/g, ' ')}`
       ).join(' | ');
       
       // Get top comment likes
-      const topCommentLikes = Math.max(...(post.latestComments || []).map(c => c.likesCount || 0), 0);
+      const commentLikes = (post.latestComments || []).map(c => c.likesCount || 0);
+      const topCommentLikes = commentLikes.length > 0 ? Math.max(...commentLikes) : 0;
       
       // Music info
       const musicArtist = post.musicInfo?.artist_name || '';
@@ -292,7 +300,14 @@ function downloadDataAsCSV(data, filename) {
         `"${post.ownerUsername || ''}"`,
         `"${post.ownerFullName || ''}"`,
         `"${post.ownerId || ''}"`,
-        `"${post.owner?.is_verified || false}"`,
+        `"${post.ownerIsVerified || false}"`,
+        post.ownerFollowersCount || 0,
+        post.ownerFollowingCount || 0,
+        post.ownerPostsCount || 0,
+        `"${(post.ownerBiography || '').replace(/"/g, '""').replace(/\n/g, ' ')}"`,
+        `"${post.ownerExternalUrl || ''}"`,
+        `"${post.ownerIsBusinessAccount || false}"`,
+        `"${post.ownerCategory || ''}"`,
         `"${(post.caption || '').replace(/"/g, '""').replace(/\n/g, ' ')}"`,
         `"${hashtags}"`,
         `"${mentions}"`,
@@ -300,11 +315,12 @@ function downloadDataAsCSV(data, filename) {
         post.commentsCount || 0,
         post.videoViewCount || 0,
         post.videoPlayCount || 0,
-        `"${new Date(post.timestamp).toLocaleString()}"`,
+        `"${post.timestamp ? new Date(post.timestamp).toLocaleString() : ''}"`,
         `"${post.inputUrl || ''}"`,
         `"${post.url || ''}"`,
         `"${post.videoUrl || ''}"`,
         `"${post.displayUrl || ''}"`,
+        `"${post.ownerProfilePicUrlHD || post.ownerProfilePicUrl || ''}"`,
         post.videoDuration || 0,
         `"${post.dimensionsWidth || 0} x ${post.dimensionsHeight || 0}"`,
         `"${post.locationName || ''}"`,
@@ -357,4 +373,356 @@ function purgeAllScrapes() {
     });
 }
 
-window.addEventListener('DOMContentLoaded', loadDashboardData);
+// Navigation function with purge warning
+async function navigateToNewScrape() {
+  try {
+    // Check if there's existing data
+    const res = await fetch(`${getBaseUrl()}/api/scrapes`);
+    const scrapes = await res.json();
+    
+    if (scrapes.length === 0) {
+      // No existing data, navigate directly
+      window.location.href = 'scrape.html';
+      return;
+    }
+
+    // Show purge warning with download option
+    const proceed = confirm(
+      '⚠️ IMPORTANT: Starting a new scrape will PURGE all existing data!\n\n' +
+      '📥 Please download your current CSV data before proceeding.\n\n' +
+      '🗑️ All previous scrapes will be permanently deleted.\n\n' +
+      'Click OK to download CSV and continue to new scrape.\n' +
+      'Click Cancel to stay on dashboard and download manually.'
+    );
+    
+    if (proceed) {
+      // Download CSV first, then purge and navigate
+      await downloadCSVAndPurge();
+    }
+    // If cancelled, stay on dashboard (no action needed)
+    
+  } catch (err) {
+    console.error('Error checking existing data:', err);
+    // If there's an error, just navigate (fail gracefully)
+    window.location.href = 'scrape.html';
+  }
+}
+
+async function downloadCSVAndPurge() {
+  try {
+    // First download the CSV
+    const res = await fetch(`${getBaseUrl()}/data.json`);
+    const data = await res.json();
+    
+    if (data.length > 0) {
+      // Download CSV with timestamp
+      const timestamp = new Date().toISOString().split('T')[0];
+      downloadDataAsCSV(data, `instagram-backup-${timestamp}.csv`);
+      
+      // Wait a moment for download to start
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    
+    // Then purge all scrapes
+    const purgeRes = await fetch(`${getBaseUrl()}/api/scrapes`, {
+      method: 'DELETE'
+    });
+    
+    if (purgeRes.ok) {
+      // Navigate to scrape page after successful purge
+      window.location.href = 'scrape.html';
+    } else {
+      const error = await purgeRes.json();
+      alert('Failed to purge data: ' + error.error + '\nPlease try again or purge manually.');
+    }
+    
+  } catch (err) {
+    console.error('Error during download and purge:', err);
+    alert('Error occurred during backup and purge. Please download CSV manually and try again.');
+  }
+}
+
+// ===== ANALYTICS FUNCTIONALITY =====
+
+// View toggle functionality
+function toggleView(view) {
+  const analyticsView = document.getElementById('analyticsOverview');
+  const dataView = document.getElementById('dataView');
+  const analyticsBtn = document.querySelector('[onclick="toggleView(\'analytics\')"]');
+  const dataBtn = document.querySelector('[onclick="toggleView(\'data\')"]');
+
+  if (view === 'analytics') {
+    analyticsView.style.display = 'block';
+    dataView.style.display = 'none';
+    analyticsBtn?.classList.add('active');
+    dataBtn?.classList.remove('active');
+    currentView = 'analytics';
+    loadAnalytics();
+  } else {
+    analyticsView.style.display = 'none';
+    dataView.style.display = 'block';
+    analyticsBtn?.classList.remove('active');
+    dataBtn?.classList.add('active');
+    currentView = 'data';
+    loadDashboardData();
+  }
+}
+
+// Load analytics data and render dashboard
+async function loadAnalytics() {
+  try {
+    // Show loading state
+    updateKPIs({ loading: true });
+    updateCreatorsList([]);
+    updateInsights([]);
+
+    // Fetch analytics data
+    const res = await fetch(`${getBaseUrl()}/api/analytics`);
+    const analytics = await res.json();
+
+    if (analytics.error) {
+      showAnalyticsError(analytics.message || analytics.error);
+      return;
+    }
+
+    // Update KPIs
+    updateKPIs(analytics.summary);
+
+    // Update charts
+    updatePerformanceChart(analytics.performanceDistribution);
+    updateEngagementChart(analytics.creatorStats);
+
+    // Update creator performance matrix
+    updateCreatorsList(analytics.creatorStats);
+
+    // Update insights
+    updateInsights(analytics.insights || []);
+
+    console.log('📊 Analytics dashboard loaded successfully');
+  } catch (err) {
+    console.error('❌ Failed to load analytics:', err);
+    showAnalyticsError('Failed to load analytics data. Please try again.');
+  }
+}
+
+// Update KPI cards
+function updateKPIs(summary) {
+  if (summary.loading) {
+    document.getElementById('totalPosts').textContent = '⏳';
+    document.getElementById('totalCreators').textContent = '⏳';
+    document.getElementById('avgEngagement').textContent = '⏳';
+    document.getElementById('avgPerformance').textContent = '⏳';
+    return;
+  }
+
+  document.getElementById('totalPosts').textContent = summary.totalPosts?.toLocaleString() || '0';
+  document.getElementById('totalCreators').textContent = summary.totalCreators?.toLocaleString() || '0';
+  document.getElementById('avgEngagement').textContent = summary.avgEngagementRate ? `${summary.avgEngagementRate}%` : '0%';
+  document.getElementById('avgPerformance').textContent = summary.avgPerformanceScore || '0';
+}
+
+// Update performance distribution chart
+function updatePerformanceChart(distribution) {
+  const ctx = document.getElementById('performanceChart').getContext('2d');
+  
+  if (performanceChart) {
+    performanceChart.destroy();
+  }
+
+  const data = {
+    labels: ['Excellent (>6%)', 'Good (3-6%)', 'Average (1-3%)', 'Poor (<1%)'],
+    datasets: [{
+      data: [
+        distribution.excellent || 0,
+        distribution.good || 0,
+        distribution.average || 0,
+        distribution.poor || 0
+      ],
+      backgroundColor: ['#10B981', '#3B82F6', '#F59E0B', '#EF4444'],
+      borderWidth: 2,
+      borderColor: '#fff'
+    }]
+  };
+
+  performanceChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: data,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            padding: 20,
+            usePointStyle: true
+          }
+        }
+      }
+    }
+  });
+}
+
+// Update engagement rate chart
+function updateEngagementChart(creatorStats) {
+  const ctx = document.getElementById('engagementChart').getContext('2d');
+  
+  if (engagementChart) {
+    engagementChart.destroy();
+  }
+
+  // Take top 10 creators for chart
+  const topCreators = creatorStats.slice(0, 10);
+  
+  const data = {
+    labels: topCreators.map(creator => `@${creator.username}`),
+    datasets: [{
+      label: 'Engagement Rate (%)',
+      data: topCreators.map(creator => creator.avgEngagementRate),
+      backgroundColor: 'rgba(45, 225, 194, 0.2)',
+      borderColor: '#2DE1C2',
+      borderWidth: 2,
+      fill: true
+    }]
+  };
+
+  engagementChart = new Chart(ctx, {
+    type: 'bar',
+    data: data,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: 'Engagement Rate (%)'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Creators'
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          display: false
+        }
+      }
+    }
+  });
+}
+
+// Update creators performance list
+function updateCreatorsList(creatorStats) {
+  const container = document.getElementById('creatorsList');
+  
+  if (creatorStats.length === 0) {
+    container.innerHTML = '<p class="loading">No creator data available</p>';
+    return;
+  }
+
+  // Take top 10 creators
+  const topCreators = creatorStats.slice(0, 10);
+  
+  container.innerHTML = topCreators.map(creator => {
+    const tierBadge = getTierBadge(creator.tier);
+    const performanceBadge = getPerformanceBadge(creator.avgEngagementRate);
+    const avatar = creator.username.charAt(0).toUpperCase();
+    
+    return `
+      <div class="creator-item">
+        <div class="creator-info">
+          <div class="creator-avatar">${avatar}</div>
+          <div class="creator-details">
+            <h4>@${creator.username} ${creator.isVerified ? '✓' : ''}</h4>
+            <p>${creator.followers?.toLocaleString() || '0'} followers • ${creator.postCount} posts</p>
+          </div>
+        </div>
+        <div class="creator-metrics">
+          <div class="metric-badge ${performanceBadge.class}">${performanceBadge.label}</div>
+          <div class="metric-badge">${creator.avgEngagementRate}%</div>
+          <div class="performance-score">${creator.avgPerformanceScore}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Update insights section
+function updateInsights(insights) {
+  const container = document.getElementById('insightsList');
+  
+  if (insights.length === 0) {
+    container.innerHTML = '<p class="loading">Generating insights...</p>';
+    return;
+  }
+
+  container.innerHTML = insights.map(insight => `
+    <div class="insight-item ${insight.type}">
+      <div class="insight-title">${insight.title}</div>
+      <div class="insight-message">${insight.message}</div>
+      <div class="insight-recommendation"><strong>Recommendation:</strong> ${insight.recommendation}</div>
+    </div>
+  `).join('');
+}
+
+// Helper functions
+function getTierBadge(tier) {
+  const tiers = {
+    nano: { label: 'Nano', class: 'excellent' },
+    micro: { label: 'Micro', class: 'good' },
+    macro: { label: 'Macro', class: 'average' },
+    mega: { label: 'Mega', class: 'poor' }
+  };
+  return tiers[tier] || { label: 'Unknown', class: 'average' };
+}
+
+function getPerformanceBadge(engagementRate) {
+  if (engagementRate >= 6) return { label: 'Excellent', class: 'excellent' };
+  if (engagementRate >= 3) return { label: 'Good', class: 'good' };
+  if (engagementRate >= 1) return { label: 'Average', class: 'average' };
+  return { label: 'Poor', class: 'poor' };
+}
+
+function showAnalyticsError(message) {
+  const container = document.getElementById('analyticsOverview');
+  container.innerHTML = `
+    <div class="container">
+      <div class="analytics-error" style="text-align: center; padding: 3rem; color: var(--color-text-muted);">
+        <h2>📊 No Analytics Data Available</h2>
+        <p>${message}</p>
+        <button class="btn btn-primary" onclick="window.location.href='scrape.html'">Start Scraping</button>
+      </div>
+    </div>
+  `;
+}
+
+// Enhanced refresh function
+function refreshDashboard() {
+  if (currentView === 'analytics') {
+    loadAnalytics();
+  } else {
+    loadDashboardData();
+  }
+  
+  if (document.getElementById('scrapeManager').style.display !== 'none') {
+    loadScrapesList();
+  }
+}
+
+// Initialize dashboard
+window.addEventListener('DOMContentLoaded', () => {
+  // Set initial view buttons
+  const analyticsBtn = document.querySelector('[onclick="toggleView(\'analytics\')"]');
+  const dataBtn = document.querySelector('[onclick="toggleView(\'data\')"]');
+  
+  if (analyticsBtn) analyticsBtn.classList.add('active');
+  if (dataBtn) dataBtn.classList.remove('active');
+  
+  // Load analytics by default
+  loadAnalytics();
+});

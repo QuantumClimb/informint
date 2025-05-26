@@ -13,7 +13,10 @@
 <body>
   <header class="site-header">
     <div class="container">
-      <a href="index.html" class="logo">Informint</a>
+      <a href="index.html" class="logo">
+        <img src="public/logo.png" alt="Informint - Instagram Analytics Platform" class="logo-image">
+        <span class="logo-text">Informint</span>
+      </a>
       <nav class="nav">
         <ul>
           <li><a href="index.html">Home</a></li>
@@ -27,60 +30,91 @@
           🌙
         </button>
       </div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle mobile menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
     </div>
   </header>
 
+  <!-- Mobile Navigation -->
+  <nav class="mobile-nav" id="mobileNav">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="scrape.html">Scrape</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="pricing.html">Pricing</a></li>
+    </ul>
+    <div class="mobile-actions">
+      <button class="theme-toggle" id="mobileThemeToggle" aria-label="Toggle dark mode">
+        🌙 Dark Mode
+      </button>
+    </div>
+  </nav>
+
   <main>
+    <!-- Hero -->
+    <section class="hero hero-compact">
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-text">
+            <h1>Simple, <span class="highlight">Transparent Pricing</span></h1>
+            <p>Start free or get a custom solution built for your business needs. Choose the plan that fits your Instagram analytics requirements and scale your social media intelligence.</p>
+            <div class="hero-cta">
+              <button class="btn btn-primary" onclick="window.location.href='scrape.html'">Start Free Now</button>
+              <button class="btn btn-outline" onclick="window.open('mailto:contact@quantmclimb.com?subject=Custom Informint Plan Request&body=Hi! I\'m interested in a custom Instagram analytics solution. Please contact me to discuss my requirements.', '_blank')">Contact Sales</button>
+            </div>
+          </div>
+          <div class="hero-image">
+            <img src="public/pricing_banner.png" alt="Informint Pricing Plans" class="banner-image banner-image-small">
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="pricing-section">
       <div class="container">
-        <h1>Simple, Transparent Pricing</h1>
-        <p>Choose the plan that's right for your Instagram analytics needs</p>
 
         <div class="pricing-grid">
           <div class="plan-card">
-            <h2>Free</h2>
+            <h2>Free Plan</h2>
             <p class="price">$0 <span>/forever</span></p>
             <ul>
-              <li>✅ 1 scrape per day</li>
-              <li>✅ Up to 10 URLs per scrape</li>
-              <li>✅ Basic metrics</li>
-              <li>✅ 5 days data retention</li>
+              <li>✅ 3 scrapes per day</li>
+              <li>✅ Up to 3 URLs per scrape</li>
+              <li>✅ Full analytics dashboard</li>
+              <li>✅ 40+ data points extraction</li>
+              <li>✅ Creator intelligence</li>
+              <li>✅ Performance metrics</li>
               <li>✅ CSV export</li>
+              <li>✅ 7 days data retention</li>
             </ul>
-            <button class="btn btn-outline">Get Started</button>
+            <button class="btn btn-primary" onclick="window.location.href='scrape.html'">Start Free Now</button>
           </div>
 
-          <div class="plan-card popular">
-            <h2>Pro <span class="badge">Most Popular</span></h2>
-            <p class="price">$19 <span>/month</span></p>
-            <ul>
-              <li>✅ 50 scrapes per day</li>
-              <li>✅ Up to 100 URLs per scrape</li>
-              <li>✅ Full metrics access</li>
-              <li>✅ 30 days data retention</li>
-              <li>✅ CSV & PDF export</li>
-              <li>✅ Sentiment analysis</li>
-              <li>✅ Email notifications</li>
-              <li>✅ Basic API access</li>
-            </ul>
-            <button class="btn btn-primary">Subscribe</button>
-          </div>
-
-          <div class="plan-card">
-            <h2>Enterprise</h2>
-            <p class="price">$49 <span>/month</span></p>
-            <ul>
-              <li>✅ Unlimited scrapes</li>
-              <li>✅ Unlimited URLs per scrape</li>
-              <li>✅ Advanced analytics</li>
-              <li>✅ 90 days data retention</li>
-              <li>✅ All export formats</li>
-              <li>✅ Advanced sentiment analysis</li>
-              <li>✅ Custom notifications</li>
-              <li>✅ Full API access</li>
-              <li>✅ Dedicated support</li>
-            </ul>
-            <button class="btn btn-outline">Contact Sales</button>
+          <div class="plan-card custom-plan">
+            <div class="custom-badge">🚀 Custom Solution</div>
+            <h2>Enterprise & Custom Plans</h2>
+            <p class="price">Custom <span>/pricing</span></p>
+            <div class="custom-features">
+              <h3>🎯 Tailored for Your Business</h3>
+              <ul>
+                <li>✅ Unlimited scrapes & URLs</li>
+                <li>✅ Advanced analytics & reporting</li>
+                <li>✅ Custom integrations & API</li>
+                <li>✅ White-label solutions</li>
+                <li>✅ Dedicated support & training</li>
+                <li>✅ Custom data retention</li>
+                <li>✅ Multi-user team access</li>
+                <li>✅ Priority feature development</li>
+              </ul>
+              <div class="contact-info">
+                <p><strong>Let's build something amazing together!</strong></p>
+                <p>Our team at Quantm Climb will work with you to create a custom Instagram analytics solution that fits your exact requirements.</p>
+              </div>
+            </div>
+            <button class="btn btn-primary contact-btn" onclick="window.open('mailto:contact@quantmclimb.com?subject=Custom Informint Plan Request&body=Hi! I\'m interested in a custom Instagram analytics solution. Please contact me to discuss my requirements.', '_blank')">Contact Quantm Climb</button>
           </div>
         </div>
       </div>
@@ -90,47 +124,60 @@
       <div class="container">
         <h2>Frequently Asked Questions</h2>
         <div class="faq-grid">
-          <div><strong>What is a “scrape”?</strong><br/>A batch of Instagram posts processed in one session.</div>
-          <div><strong>Can I upgrade or downgrade?</strong><br/>Yes, changes take effect at the start of the next billing cycle.</div>
-          <div><strong>Do you offer refunds?</strong><br/>7-day money-back guarantee for first-time subscribers.</div>
-          <div><strong>How does data retention work?</strong><br/>Data is stored based on your plan. After that, it's deleted unless exported.</div>
+          <div><strong>What is a "scrape"?</strong><br/>A scrape is a batch of Instagram posts processed in one session, extracting 40+ data points including engagement metrics and creator intelligence.</div>
+          <div><strong>What's included in the free plan?</strong><br/>3 scrapes per day, up to 3 URLs per scrape, full analytics dashboard, creator intelligence, and 7 days data retention.</div>
+          <div><strong>How do custom plans work?</strong><br/>Our team at Quantm Climb will work with you to build a tailored solution that fits your specific business requirements and scale.</div>
+          <div><strong>What kind of data do you extract?</strong><br/>We extract comprehensive data including engagement metrics, follower counts, verification status, content analytics, and detailed creator profiles.</div>
+          <div><strong>Can I export my data?</strong><br/>Yes! All plans include CSV export functionality for easy integration with your existing analytics workflows.</div>
+          <div><strong>Is there an API available?</strong><br/>API access is available with custom enterprise plans. Contact us to discuss your integration requirements.</div>
         </div>
       </div>
     </section>
   </main>
 
   <footer class="site-footer">
-    <div class="container footer-grid">
-      <div>
-        <h4>Informint</h4>
-        <p>Fresh Data. Real Influence. The ultimate tool for Instagram campaign analytics and reporting.</p>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <img src="public/logo.png" alt="Informint Logo" class="footer-logo-image">
+            <h4>Informint</h4>
+          </div>
+          <p>Professional Instagram Analytics & Data Intelligence Platform. Empowering marketers, creators, and agencies with actionable social media insights and comprehensive influencer intelligence.</p>
+        </div>
+        <div>
+          <h4>Product</h4>
+          <ul>
+            <li><a href="scrape.html">Scrape</a></li>
+            <li><a href="dashboard.html">Dashboard</a></li>
+            <li><a href="pricing.html">Pricing</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Company</h4>
+          <ul>
+            <li><a href="#">About</a></li>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="#">Terms</a></li>
+            <li><a href="#">Privacy</a></li>
+            <li><a href="#">Cookies</a></li>
+          </ul>
+        </div>
       </div>
-      <div>
-        <h4>Product</h4>
-        <ul>
-          <li><a href="scrape.html">Scrape</a></li>
-          <li><a href="dashboard.html">Dashboard</a></li>
-          <li><a href="pricing.html">Pricing</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Company</h4>
-        <ul>
-          <li><a href="#">About</a></li>
-          <li><a href="#">Blog</a></li>
-          <li><a href="#">Contact</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Legal</h4>
-        <ul>
-          <li><a href="#">Terms</a></li>
-          <li><a href="#">Privacy</a></li>
-          <li><a href="#">Cookies</a></li>
-        </ul>
+      <div class="footer-bottom">
+        <p class="footer-copy">&copy; 2025 Informint. All rights reserved.</p>
+        <div class="powered-by">
+          <span>Powered by</span>
+          <img src="public/qc.png" alt="Quantm Climb" class="qc-logo">
+        </div>
       </div>
     </div>
-    <p class="footer-copy">&copy; 2025 Informint. All rights reserved.</p>
   </footer>
 
   <script>
@@ -138,29 +185,73 @@
     function initTheme() {
       const savedTheme = localStorage.getItem('theme') || 'light';
       const themeToggle = document.getElementById('themeToggle');
+      const mobileThemeToggle = document.getElementById('mobileThemeToggle');
       
       // Apply saved theme
       document.documentElement.setAttribute('data-theme', savedTheme);
       updateThemeIcon(savedTheme);
       
-      // Theme toggle event listener
-      themeToggle.addEventListener('click', () => {
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-        updateThemeIcon(newTheme);
+      // Theme toggle event listeners
+      [themeToggle, mobileThemeToggle].forEach(toggle => {
+        if (toggle) {
+          toggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+          });
+        }
       });
     }
     
     function updateThemeIcon(theme) {
       const themeToggle = document.getElementById('themeToggle');
-      themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+      const mobileThemeToggle = document.getElementById('mobileThemeToggle');
+      
+      if (themeToggle) themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+      if (mobileThemeToggle) mobileThemeToggle.textContent = theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+    }
+
+    // Mobile Menu Management
+    function initMobileMenu() {
+      const hamburger = document.getElementById('hamburger');
+      const mobileNav = document.getElementById('mobileNav');
+      
+      if (hamburger && mobileNav) {
+        hamburger.addEventListener('click', () => {
+          hamburger.classList.toggle('active');
+          mobileNav.classList.toggle('active');
+          document.body.style.overflow = mobileNav.classList.contains('active') ? 'hidden' : '';
+        });
+
+        // Close mobile menu when clicking on links
+        const mobileLinks = mobileNav.querySelectorAll('a');
+        mobileLinks.forEach(link => {
+          link.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            mobileNav.classList.remove('active');
+            document.body.style.overflow = '';
+          });
+        });
+
+        // Close mobile menu when clicking outside
+        mobileNav.addEventListener('click', (e) => {
+          if (e.target === mobileNav) {
+            hamburger.classList.remove('active');
+            mobileNav.classList.remove('active');
+            document.body.style.overflow = '';
+          }
+        });
+      }
     }
     
-    // Initialize theme on page load
-    document.addEventListener('DOMContentLoaded', initTheme);
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      initMobileMenu();
+    });
   </script>
 </body>
 </html>

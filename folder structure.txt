@@ -1,0 +1,261 @@
+📁 Folder structure for: newbirt
+
+├── .env
+├── .git/
+│   ├── COMMIT_EDITMSG
+│   ├── HEAD
+│   ├── config
+│   ├── description
+│   ├── hooks/
+│   │   ├── applypatch-msg.sample
+│   │   ├── commit-msg.sample
+│   │   ├── fsmonitor-watchman.sample
+│   │   ├── post-update.sample
+│   │   ├── pre-applypatch.sample
+│   │   ├── pre-commit.sample
+│   │   ├── pre-merge-commit.sample
+│   │   ├── pre-push.sample
+│   │   ├── pre-rebase.sample
+│   │   ├── pre-receive.sample
+│   │   ├── prepare-commit-msg.sample
+│   │   ├── push-to-checkout.sample
+│   │   ├── sendemail-validate.sample
+│   │   └── update.sample
+│   ├── index
+│   ├── info/
+│   │   └── exclude
+│   ├── logs/
+│   │   ├── HEAD
+│   │   └── refs/
+│   │       ├── heads/
+│   │       │   └── main
+│   │       └── remotes/
+│   │           └── origin/
+│   │               └── main
+│   ├── objects/
+│   │   ├── 12/
+│   │   │   ├── d0764e3f0c63cb412c06d48a8aa4af076e0a32
+│   │   │   └── ee685f435225101819b3dee7f33f2097b2c480
+│   │   ├── 13/
+│   │   │   └── 03b1362a981b0ec742a561d9e6d3eeb4e286a1
+│   │   ├── 18/
+│   │   │   └── b18acf6bd3b1786b66998db9773b41c1b706c2
+│   │   ├── 1b/
+│   │   │   └── 65301cbc2dfa423e38745c9e6981d43393a3d6
+│   │   ├── 23/
+│   │   │   ├── 29d92d3f4b2af3a7e383a4837457d99647f87e
+│   │   │   └── c75d72f47e184ec99abf03b1b7ff63750dfbb5
+│   │   ├── 28/
+│   │   │   └── f041a3b7af9fed1d32816f96db46e3fbb3ffbc
+│   │   ├── 2c/
+│   │   │   └── 01083eb3f250ad78f57c3e3908936f639104b8
+│   │   ├── 37/
+│   │   │   └── 7e8cba25f35d990ff0a3ce28d94dca2ef03336
+│   │   ├── 46/
+│   │   │   ├── bbd8990409412810dcc3cbd52c7df72fa982e0
+│   │   │   └── d227645c2bc52d5607334ece62f4a3be111201
+│   │   ├── 4c/
+│   │   │   └── 0a5715004c684dfe2dfc5712fdbfff22fcf62a
+│   │   ├── 50/
+│   │   │   └── 199e57594965d947a2712888cf7fdd633a417e
+│   │   ├── 58/
+│   │   │   └── 24c9d093dd479a5127a0f9e6d2db2ae4263911
+│   │   ├── 5d/
+│   │   │   └── 549ab751896a21bc4bab96018aabd702b68d1c
+│   │   ├── 5e/
+│   │   │   └── ef799fc57c779b79508b9ed373b4b661172cf1
+│   │   ├── 62/
+│   │   │   └── dcfaf4a64bd5bf067c272798ff1687c8fb11e3
+│   │   ├── 65/
+│   │   │   └── 4c3a3abf895495bba6a97b26b3bb5f373cbc8c
+│   │   ├── 67/
+│   │   │   └── 801468840562ee8367bd69c876a96868ec9536
+│   │   ├── 73/
+│   │   │   └── 03c6189c6b89f1d91703ceae802393f5a1e5b6
+│   │   ├── 79/
+│   │   │   └── 48ff902453074769b6c49b395fdf5c750679d1
+│   │   ├── 7b/
+│   │   │   └── 6e5dfa0dd347f54f807e640fc08c1480228718
+│   │   ├── 7c/
+│   │   │   └── 1c27fa8803c901ba4578d4e3681d91636b6088
+│   │   ├── 8a/
+│   │   │   └── a060ec7c2cd7e57afb41ff83e7ccc359582033
+│   │   ├── 96/
+│   │   │   └── def8adcf4f7b12015a3e061b066047c252abea
+│   │   ├── a8/
+│   │   │   ├── 9979257d8454f708d1f5eff38d5efbf76b67dc
+│   │   │   └── f6804855aea404ed787369dc3c40b93167b22a
+│   │   ├── aa/
+│   │   │   └── e1055638e0d77874683dd59e8a6781883a32dc
+│   │   ├── b3/
+│   │   │   └── e52f613cd57b59179a8cb403268df624187f08
+│   │   ├── bb/
+│   │   │   └── 75b39198a27382df2e8b95c63eec6fa8367024
+│   │   ├── bf/
+│   │   │   └── 0ded21d106a21c84b898efb2235342cb7b3a4e
+│   │   ├── d7/
+│   │   │   ├── 4b217cdb6b21b39666990fbffac058dbd45358
+│   │   │   ├── 4ba41ca78db8ccaffe290a6ac6edcac99b623c
+│   │   │   └── d33e8938b92b286266636e1a47879fe22f5af6
+│   │   ├── e7/
+│   │   │   └── 7c0c7b1b9cd412330ba125c088907a2289e0d3
+│   │   ├── ea/
+│   │   │   └── ab97fba7301273532d48450c7bbe3933d10323
+│   │   ├── f0/
+│   │   │   └── e7d851731756890d1b52b1b85b5a9640e11a59
+│   │   ├── f2/
+│   │   │   └── a51d5f157995de77fd46fdd3df7f2483d70c3e
+│   │   ├── f5/
+│   │   │   └── 4225185d18361e6da29cc227d4bfddae0cb41f
+│   │   ├── f7/
+│   │   │   └── e235b1e141efe004115c353df1234d5ca1a660
+│   │   ├── f8/
+│   │   │   └── 50b082fb59a5ac2a96fd61cbe1ed285daaed22
+│   │   ├── fe/
+│   │   │   └── 3f5111c2250536b930f7e5acad6f65273e9e4a
+│   │   ├── info/
+│   │   └── pack/
+│   └── refs/
+│       ├── heads/
+│       │   └── main
+│       ├── remotes/
+│       │   └── origin/
+│       │       └── main
+│       └── tags/
+├── .gitignore
+├── 3ds_max_design.jpg
+├── Home.png
+├── Pricing.png
+├── README.md  # Informint - Instagram Analytics & Data Intelligence Platform
+├── Scrape.png
+├── analytics/
+├── analytics.js
+├── backups/
+│   ├── backup-2025-05-26T07-03-21-722Z.json
+│   ├── backup-2025-05-26T16-42-29-348Z.json
+│   ├── backup-2025-05-26T17-01-03-208Z.json
+│   └── backup-2025-05-26T17-11-59-933Z.json
+├── config.js  # Configuration file for Informint
+├── css/
+│   └── styles.css
+├── dashboard.html
+├── dashboard.js  # Global variables
+├── dashboard.png
+├── env.example
+├── index.html
+├── index.js
+├── instagram-scrape-variables.txt
+├── node_modules/
+│   ├── .bin/
+│   ├── .package-lock.json/
+│   ├── @apify/
+│   ├── @crawlee/
+│   ├── @sindresorhus/
+│   ├── accepts/
+│   ├── agentkeepalive/
+│   ├── ansi-colors/
+│   ├── apify-client/
+│   ├── async-retry/
+│   ├── asynckit/
+│   ├── axios/
+│   ├── body-parser/
+│   ├── bytes/
+│   ├── call-bind-apply-helpers/
+│   ├── call-bound/
+│   ├── callsites/
+│   ├── combined-stream/
+│   ├── content-disposition/
+│   ├── content-type/
+│   ├── cookie/
+│   ├── cookie-signature/
+│   ├── cors/
+│   ├── debug/
+│   ├── delayed-stream/
+│   ├── depd/
+│   ├── dot-prop/
+│   ├── dotenv/
+│   ├── dunder-proto/
+│   ├── ee-first/
+│   ├── encodeurl/
+│   ├── es-define-property/
+│   ├── es-errors/
+│   ├── es-object-atoms/
+│   ├── es-set-tostringtag/
+│   ├── escape-html/
+│   ├── etag/
+│   ├── express/
+│   ├── finalhandler/
+│   ├── follow-redirects/
+│   ├── form-data/
+│   ├── forwarded/
+│   ├── fresh/
+│   ├── function-bind/
+│   ├── get-intrinsic/
+│   ├── get-proto/
+│   ├── gopd/
+│   ├── has-symbols/
+│   ├── has-tostringtag/
+│   ├── hasown/
+│   ├── http-errors/
+│   ├── humanize-ms/
+│   ├── iconv-lite/
+│   ├── inherits/
+│   ├── ipaddr.js/
+│   ├── is-obj/
+│   ├── is-promise/
+│   ├── lodash.isequal/
+│   ├── math-intrinsics/
+│   ├── media-typer/
+│   ├── merge-descriptors/
+│   ├── mime-db/
+│   ├── mime-types/
+│   ├── ms/
+│   ├── negotiator/
+│   ├── object-assign/
+│   ├── object-inspect/
+│   ├── on-finished/
+│   ├── once/
+│   ├── ow/
+│   ├── parseurl/
+│   ├── path-to-regexp/
+│   ├── prettier/
+│   ├── proxy-addr/
+│   ├── proxy-from-env/
+│   ├── qs/
+│   ├── range-parser/
+│   ├── raw-body/
+│   ├── retry/
+│   ├── router/
+│   ├── safe-buffer/
+│   ├── safer-buffer/
+│   ├── send/
+│   ├── serve-static/
+│   ├── setprototypeof/
+│   ├── side-channel/
+│   ├── side-channel-list/
+│   ├── side-channel-map/
+│   ├── side-channel-weakmap/
+│   ├── statuses/
+│   ├── toidentifier/
+│   ├── tslib/
+│   ├── type-fest/
+│   ├── type-is/
+│   ├── unpipe/
+│   ├── vali-date/
+│   ├── vary/
+│   └── wrappy/
+├── package-lock.json
+├── package.json
+├── preview-939.png
+├── pricing.html
+├── public/
+│   ├── banner.jpg
+│   ├── logo.png
+│   ├── manifest.json
+│   ├── qc.png
+│   └── share-image.png
+├── scan_structure.py
+├── scrape.html
+└── scrapes/
+    ├── scrape-2025-05-26T16-46-01-262Z.json
+    └── scrape-2025-05-26T17-16-20-918Z.json

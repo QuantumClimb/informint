@@ -1,0 +1,159 @@
+INSTAGRAM SCRAPE JSON VARIABLES
+=====================================
+
+This document lists all available variables/fields from the Instagram scrape JSON data.
+Generated on: 2025-05-26
+Updated: 2025-05-26 (Added missing profile data fields)
+
+📊 POST BASIC INFORMATION
+-------------------------
+- inputUrl (string): The original URL that was scraped
+- id (string): Instagram post ID
+- type (string): Post type (e.g., "Video", "Image", "Carousel")
+- shortCode (string): Instagram short code (e.g., "DEOqLs6PvtS")
+- url (string): Instagram post URL
+- alt (string/null): Alt text for accessibility
+
+👤 OWNER/CREATOR INFORMATION
+----------------------------
+- ownerUsername (string): Username of the post creator
+- ownerFullName (string): Full display name of the post creator
+- ownerId (string): Instagram user ID of the post creator
+
+🔥 MISSING PROFILE DATA (TO BE ADDED):
+--------------------------------------
+- ownerFollowersCount (number): Number of followers the creator has
+- ownerFollowingCount (number): Number of accounts the creator follows
+- ownerIsVerified (boolean): Whether the creator is verified (blue checkmark)
+- ownerProfilePicUrl (string): Creator's profile picture URL (150x150)
+- ownerProfilePicUrlHD (string): Creator's high-resolution profile picture URL
+- ownerBiography (string): Creator's bio/description text
+- ownerExternalUrl (string): External link in creator's bio
+- ownerIsBusinessAccount (boolean): Whether it's a business account
+- ownerPostsCount (number): Total number of posts by the creator
+- ownerAccountType (number): Account type (1=personal, 2=business, 3=creator)
+- ownerCategory (string): Business category (if business account)
+
+📝 CONTENT INFORMATION
+----------------------
+- caption (string): Post caption/description text
+- hashtags (array): List of hashtags used in the post
+- mentions (array): List of @mentions in the post
+- firstComment (string): The first comment on the post
+
+💬 COMMENTS DATA
+----------------
+- commentsCount (number): Total number of comments
+- isCommentsDisabled (boolean): Whether comments are disabled
+- latestComments (array): Array of latest comments, each containing:
+  - id (string): Comment ID
+  - text (string): Comment text
+  - ownerUsername (string): Commenter's username
+  - ownerProfilePicUrl (string): Commenter's profile picture URL
+  - timestamp (string): Comment timestamp (ISO format)
+  - repliesCount (number): Number of replies to this comment
+  - replies (array): Array of reply objects with same structure
+  - likesCount (number): Number of likes on the comment
+  - owner (object): Comment owner details:
+    - id (string): User ID
+    - is_verified (boolean): Verification status
+    - profile_pic_url (string): Profile picture URL
+    - username (string): Username
+
+📊 ENGAGEMENT METRICS
+---------------------
+- likesCount (number): Number of likes on the post
+- videoViewCount (number): Number of video views
+- videoPlayCount (number): Number of video plays
+- commentsCount (number): Total comments count
+
+🎥 VIDEO/MEDIA INFORMATION
+--------------------------
+- videoUrl (string): Direct video file URL
+- displayUrl (string): Thumbnail/display image URL
+- images (array): Array of image URLs (for carousel posts)
+- videoDuration (number): Video duration in seconds
+- dimensionsHeight (number): Media height in pixels
+- dimensionsWidth (number): Media width in pixels
+
+📅 TIMING INFORMATION
+---------------------
+- timestamp (string): Post creation timestamp (ISO format)
+
+🏷️ TAGGING & COLLABORATION
+---------------------------
+- taggedUsers (array): Users tagged in the post, each containing:
+  - full_name (string): User's full name
+  - id (string): User ID
+  - is_verified (boolean): Verification status
+  - profile_pic_url (string): Profile picture URL
+  - username (string): Username
+
+- coauthorProducers (array): Co-authors/collaborators, each containing:
+  - id (string): User ID
+  - is_verified (boolean): Verification status
+  - profile_pic_url (string): Profile picture URL
+  - username (string): Username
+
+🎵 MUSIC/AUDIO INFORMATION
+--------------------------
+- musicInfo (object): Audio/music details:
+  - artist_name (string): Artist name
+  - song_name (string): Song title
+  - uses_original_audio (boolean): Whether original audio is used
+  - should_mute_audio (boolean): Audio muting flag
+  - should_mute_audio_reason (string): Reason for muting
+  - audio_id (string): Audio track ID
+
+📍 LOCATION INFORMATION
+-----------------------
+- locationName (string): Location name (if available)
+- locationId (string): Location ID (if available)
+
+🏢 BUSINESS/SPONSORED CONTENT
+-----------------------------
+- isSponsored (boolean): Whether the post is sponsored
+- productType (string): Product type (e.g., "clips" for Reels)
+
+📱 POST STRUCTURE
+-----------------
+- childPosts (array): For carousel posts, contains child post data
+
+🔍 ADDITIONAL METADATA
+----------------------
+- alt (string/null): Alternative text for accessibility
+
+=====================================
+🚨 CURRENT ISSUES IDENTIFIED:
+- Missing follower/following counts for post creators
+- Profile pictures may not load due to missing HD URLs
+- Verification status not available for post owners
+- Business account information missing
+
+🔧 SOLUTION IMPLEMENTED:
+We need to enhance the scraping process to include profile data by:
+1. Extracting usernames from post URLs
+2. Using Instagram Profile Scraper for each unique username
+3. Merging profile data with post data
+4. Adding the missing fields listed above
+
+=====================================
+USAGE NOTES:
+- All arrays can be empty []
+- String fields may be empty ""
+- Number fields default to 0 if not available
+- Boolean fields are true/false
+- Timestamp fields are in ISO 8601 format
+- URLs are direct Instagram CDN links
+- Some fields may be null or undefined depending on post type
+
+CSV EXPORT FIELDS:
+The dashboard CSV export includes all major fields above, with nested objects flattened into readable strings.
+
+COMMENT STRUCTURE:
+Comments can have nested replies, creating a hierarchical structure. Each reply has the same structure as a top-level comment.
+
+TAGGED USERS vs CO-AUTHORS:
+- taggedUsers: People tagged in the post content
+- coauthorProducers: Collaborators who helped create the content
+===================================== 

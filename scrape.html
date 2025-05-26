@@ -12,7 +12,10 @@
 <body>
   <header class="site-header">
     <div class="container">
-      <a href="index.html" class="logo">Informint</a>
+      <a href="index.html" class="logo">
+        <img src="public/logo.png" alt="Informint - Instagram Analytics Platform" class="logo-image">
+        <span class="logo-text">Informint</span>
+      </a>
       <nav class="nav">
         <ul>
           <li><a href="index.html">Home</a></li>
@@ -26,14 +29,53 @@
           🌙
         </button>
       </div>
+      <button class="hamburger" id="hamburger" aria-label="Toggle mobile menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
     </div>
   </header>
 
+  <!-- Mobile Navigation -->
+  <nav class="mobile-nav" id="mobileNav">
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="scrape.html">Scrape</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="pricing.html">Pricing</a></li>
+    </ul>
+    <div class="mobile-actions">
+      <button class="theme-toggle" id="mobileThemeToggle" aria-label="Toggle dark mode">
+        🌙 Dark Mode
+      </button>
+    </div>
+  </nav>
+
   <main>
+    <!-- Hero -->
+    <section class="hero hero-compact">
+      <div class="container">
+        <div class="hero-content">
+          <div class="hero-text">
+            <h1>Instagram <span class="highlight">Data Scraper</span></h1>
+            <p>Extract comprehensive Instagram analytics with our advanced scraping engine. Get 40+ data points including engagement metrics, creator profiles, and performance insights from any public Instagram post or reel.</p>
+            <div class="hero-cta">
+              <button class="btn btn-primary" onclick="document.getElementById('scrapeForm').scrollIntoView({behavior: 'smooth'})">Start Scraping</button>
+              <button class="btn btn-outline" onclick="window.location.href='dashboard.html'">View Dashboard</button>
+            </div>
+          </div>
+          <div class="hero-image">
+            <img src="public/scrape_banner.png" alt="Instagram Data Scraping Interface" class="banner-image banner-image-small">
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="scrape-input-section">
       <div class="container">
-        <h1>Instagram Post Scraper</h1>
-        <p>Enter Instagram post URLs below to extract data</p>
+        <h2>Enter Instagram URLs</h2>
+        <p>Paste Instagram post or reel URLs below to extract comprehensive analytics data</p>
 
         <form id="scrapeForm">
           <label>Instagram URLs:</label>
@@ -52,8 +94,7 @@
             <li>✅ Posts must be public</li>
             <li>✅ Use direct post or reel links (not profile URLs)</li>
             <li>⚠️ Maximum 3 URLs per scrape</li>
-            <li>🗑️ New scrapes will purge existing data</li>
-            <li>📥 Download CSV before starting new scrape</li>
+            <li>🚀 Results will appear in the Dashboard</li>
           </ul>
         </div>
       </div>
@@ -64,8 +105,11 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-brand">
-          <h4>Informint</h4>
-          <p>Fresh Data. Real Influence. The ultimate tool for Instagram campaign analytics and reporting.</p>
+          <div class="footer-logo">
+            <img src="public/logo.png" alt="Informint Logo" class="footer-logo-image">
+            <h4>Informint</h4>
+          </div>
+          <p>Professional Instagram Analytics & Data Intelligence Platform. Empowering marketers, creators, and agencies with actionable social media insights and comprehensive influencer intelligence.</p>
         </div>
         <div>
           <h4>Product</h4>
@@ -94,7 +138,13 @@
           </ul>
         </div>
       </div>
-      <p class="footer-copy">&copy; 2025 Informint. All rights reserved.</p>
+      <div class="footer-bottom">
+        <p class="footer-copy">&copy; 2025 Informint. All rights reserved.</p>
+        <div class="powered-by">
+          <span>Powered by</span>
+          <img src="public/qc.png" alt="Quantm Climb" class="qc-logo">
+        </div>
+      </div>
     </div>
   </footer>
 
@@ -103,29 +153,73 @@
     function initTheme() {
       const savedTheme = localStorage.getItem('theme') || 'light';
       const themeToggle = document.getElementById('themeToggle');
+      const mobileThemeToggle = document.getElementById('mobileThemeToggle');
       
       // Apply saved theme
       document.documentElement.setAttribute('data-theme', savedTheme);
       updateThemeIcon(savedTheme);
       
-      // Theme toggle event listener
-      themeToggle.addEventListener('click', () => {
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-        updateThemeIcon(newTheme);
+      // Theme toggle event listeners
+      [themeToggle, mobileThemeToggle].forEach(toggle => {
+        if (toggle) {
+          toggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+          });
+        }
       });
     }
     
     function updateThemeIcon(theme) {
       const themeToggle = document.getElementById('themeToggle');
-      themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+      const mobileThemeToggle = document.getElementById('mobileThemeToggle');
+      
+      if (themeToggle) themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+      if (mobileThemeToggle) mobileThemeToggle.textContent = theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+    }
+
+    // Mobile Menu Management
+    function initMobileMenu() {
+      const hamburger = document.getElementById('hamburger');
+      const mobileNav = document.getElementById('mobileNav');
+      
+      if (hamburger && mobileNav) {
+        hamburger.addEventListener('click', () => {
+          hamburger.classList.toggle('active');
+          mobileNav.classList.toggle('active');
+          document.body.style.overflow = mobileNav.classList.contains('active') ? 'hidden' : '';
+        });
+
+        // Close mobile menu when clicking on links
+        const mobileLinks = mobileNav.querySelectorAll('a');
+        mobileLinks.forEach(link => {
+          link.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            mobileNav.classList.remove('active');
+            document.body.style.overflow = '';
+          });
+        });
+
+        // Close mobile menu when clicking outside
+        mobileNav.addEventListener('click', (e) => {
+          if (e.target === mobileNav) {
+            hamburger.classList.remove('active');
+            mobileNav.classList.remove('active');
+            document.body.style.overflow = '';
+          }
+        });
+      }
     }
     
-    // Initialize theme on page load
-    document.addEventListener('DOMContentLoaded', initTheme);
+    // Initialize theme and mobile menu on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      initMobileMenu();
+    });
 
     // Get the base URL for API calls
     function getBaseUrl() {
@@ -135,17 +229,7 @@
         : window.location.origin;
     }
 
-    // Check if there's existing scrape data
-    async function checkForExistingData() {
-      try {
-        const res = await fetch(`${getBaseUrl()}/api/scrapes`);
-        const scrapes = await res.json();
-        return scrapes.length > 0;
-      } catch (err) {
-        console.error('Error checking existing data:', err);
-        return false;
-      }
-    }
+
 
     // Add URL input functionality
     document.getElementById('addUrlBtn').addEventListener('click', function() {
@@ -232,23 +316,6 @@
       submitBtn.disabled = true;
 
       try {
-        // Check if there's existing data and warn user
-        const hasExistingData = await checkForExistingData();
-        if (hasExistingData) {
-          const proceed = confirm(
-            '⚠️ IMPORTANT: Starting a new scrape will PURGE all existing data!\n\n' +
-            '📥 Please download your current CSV data from the Dashboard before proceeding.\n\n' +
-            '🗑️ All previous scrapes will be permanently deleted.\n\n' +
-            'Do you want to continue and delete all existing data?'
-          );
-          
-          if (!proceed) {
-            submitBtn.textContent = originalText;
-            submitBtn.disabled = false;
-            return;
-          }
-        }
-
         // Scrape each URL individually
         const results = [];
         for (let i = 0; i < urls.length; i++) {
