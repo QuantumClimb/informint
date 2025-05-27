@@ -4,17 +4,34 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "start:supabase": "node index-supabase.js",
     "dev": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev:supabase": "node index-supabase.js",
+    "test": "node test-supabase.js",
+    "test:integration": "node test-supabase.js",
+    "setup:env": "node setup-env.js",
+    "setup:supabase": "node scripts/setup-supabase.js",
+    "db:migrate": "node scripts/migrate-database.js",
+    "db:verify": "node scripts/verify-database.js",
+    "compare": "node compare-systems.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "instagram",
+    "analytics",
+    "scraping",
+    "supabase"
+  ],
+  "author": "Onomatix <juncando@gmail.com>",
   "license": "ISC",
   "description": "Informint - Fresh Data. Real Influence. Instagram analytics and scraping tool.",
   "dependencies": {
+    "@supabase/supabase-js": "^2.49.8",
     "apify-client": "^2.12.4",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "supabase": "^1.142.2"
   }
 }
