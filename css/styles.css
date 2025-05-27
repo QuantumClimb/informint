@@ -825,43 +825,96 @@ h1, h2, h3 {
 
 /* Dashboard Header */
 .dashboard-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 2rem 0;
+  background: var(--color-white);
+  border-bottom: 1px solid var(--color-border);
+  padding: 1rem 0;
+  margin-bottom: 2rem;
 }
 
-.dashboard-header h1 {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-}
-
-.dashboard-actions {
+.dashboard-nav {
   display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
 }
 
-.dashboard-actions .btn {
-  border-color: rgba(255,255,255,0.3);
+.nav-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-white);
+  color: var(--color-text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.nav-btn:hover {
+  background: var(--color-section-bg);
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.nav-btn-primary {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.nav-btn-primary:hover {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
   color: white;
 }
 
-.dashboard-actions .btn-outline {
-  background: rgba(255,255,255,0.1);
-  border-color: rgba(255,255,255,0.3);
+.nav-btn-secondary {
+  background: var(--color-info);
+  color: white;
+  border-color: var(--color-info);
 }
 
-.dashboard-actions .btn-outline:hover {
-  background: rgba(255,255,255,0.2);
+.nav-btn-secondary:hover {
+  background: #138496;
+  border-color: #138496;
+  color: white;
 }
 
-.dashboard-actions .btn-primary {
-  background: rgba(255,255,255,0.2);
-  border: 2px solid rgba(255,255,255,0.3);
+.nav-btn-danger {
+  background: var(--color-danger);
+  color: white;
+  border-color: var(--color-danger);
 }
 
-.dashboard-actions .btn-primary:hover {
-  background: rgba(255,255,255,0.3);
+.nav-btn-danger:hover {
+  background: var(--color-danger-hover);
+  border-color: var(--color-danger-hover);
+  color: white;
+}
+
+.btn-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Active state for navigation buttons */
+.nav-btn.active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
 }
 
 /* Scrape Manager */
@@ -1922,4 +1975,27 @@ details[open] summary {
   .chart-container {
     padding: 1rem;
   }
+}
+
+/* Mobile responsive styles for new navigation */
+.nav-buttons {
+  gap: 0.5rem;
+  justify-content: flex-start;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.nav-btn {
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  min-width: auto;
+  flex-shrink: 0;
+}
+
+.btn-icon {
+  font-size: 0.9rem;
+}
+
+.dashboard-nav {
+  overflow-x: auto;
 }

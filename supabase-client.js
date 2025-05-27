@@ -99,6 +99,13 @@ class SupabaseManager {
   // ===== INSTAGRAM POSTS =====
 
   async saveInstagramPosts(posts, sessionId) {
+    // Helper function to safely convert to integer
+    const toInt = (value) => {
+      if (value === null || value === undefined || value === '') return 0;
+      const num = parseInt(value);
+      return isNaN(num) ? 0 : num;
+    };
+
     const postsToInsert = posts.map(post => ({
       session_id: sessionId,
       user_id: this.defaultUserId,
@@ -115,16 +122,16 @@ class SupabaseManager {
       owner_username: post.ownerUsername,
       owner_full_name: post.ownerFullName,
       owner_id: post.ownerId,
-      owner_followers_count: post.ownerFollowersCount || 0,
-      owner_following_count: post.ownerFollowingCount || 0,
+      owner_followers_count: toInt(post.ownerFollowersCount),
+      owner_following_count: toInt(post.ownerFollowingCount),
       owner_is_verified: post.ownerIsVerified || false,
       owner_profile_pic_url: post.ownerProfilePicUrl,
       owner_profile_pic_url_hd: post.ownerProfilePicUrlHD,
       owner_biography: post.ownerBiography,
       owner_external_url: post.ownerExternalUrl,
       owner_is_business_account: post.ownerIsBusinessAccount || false,
-      owner_posts_count: post.ownerPostsCount || 0,
-      owner_account_type: post.ownerAccountType || 1,
+      owner_posts_count: toInt(post.ownerPostsCount),
+      owner_account_type: toInt(post.ownerAccountType) || 1,
       owner_category: post.ownerCategory,
       
       // Content Information
@@ -134,19 +141,19 @@ class SupabaseManager {
       first_comment: post.firstComment,
       
       // Engagement Metrics
-      likes_count: post.likesCount || 0,
-      comments_count: post.commentsCount || 0,
-      video_view_count: post.videoViewCount || 0,
-      video_play_count: post.videoPlayCount || 0,
+      likes_count: toInt(post.likesCount),
+      comments_count: toInt(post.commentsCount),
+      video_view_count: toInt(post.videoViewCount),
+      video_play_count: toInt(post.videoPlayCount),
       is_comments_disabled: post.isCommentsDisabled || false,
       
       // Media Information
       video_url: post.videoUrl,
       display_url: post.displayUrl,
       images: post.images || [],
-      video_duration: post.videoDuration,
-      dimensions_height: post.dimensionsHeight,
-      dimensions_width: post.dimensionsWidth,
+      video_duration: toInt(post.videoDuration),
+      dimensions_height: toInt(post.dimensionsHeight),
+      dimensions_width: toInt(post.dimensionsWidth),
       
       // Timing
       post_timestamp: post.timestamp ? new Date(post.timestamp).toISOString() : null,
@@ -421,21 +428,138 @@ class SupabaseManager {
 
   // ===== UTILITY FUNCTIONS =====
 
-  async deleteAllData() {
-    // Delete in order due to foreign key constraints
-    await this.supabase.from('instagram_comments').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-    await this.supabase.from('tagged_users').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-    await this.supabase.from('instagram_posts').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-    await this.supabase.from('scrape_sessions').delete().neq('id', '00000000-0000-0000-0000-000000000000');
-    await this.supabase.from('analytics_cache').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+  // 🚨 SECURITY FIX: Replace dangerous deleteAllData with user-specific functions
+  async purgeUserData(userId = null) {
+    const targetUserId = userId || this.defaultUserId;
     
+    console.log(`🗑️ Purging data for user: ${targetUserId}`);
+    
+    // Delete in order due to foreign key constraints
+    const commentsResult = await this.supabase
+      .from('instagram_comments')
+      .delete()
+      .in('post_id', 
+        this.supabase
+          .from('instagram_posts')
+          .select('id')
+          .eq('user_id', targetUserId)
+      );
+    
+    const taggedUsersResult = await this.supabase
+      .from('tagged_users')
+      .delete()
+      .in('post_id', 
+        this.supabase
+          .from('instagram_posts')
+          .select('id')
+          .eq('user_id', targetUserId)
+      );
+    
+    const postsResult = await this.supabase
+      .from('instagram_posts')
+      .delete()
+      .eq('user_id', targetUserId);
+    
+    const sessionsResult = await this.supabase
+      .from('scrape_sessions')
+      .delete()
+      .eq('user_id', targetUserId);
+    
+    const cacheResult = await this.supabase
+      .from('analytics_cache')
+      .delete()
+      .eq('user_id', targetUserId);
+    
+    console.log(`✅ Purged user data: ${postsResult.count || 0} posts, ${sessionsResult.count || 0} sessions`);
     return true;
   }
 
-  async getStats() {
+  // Export user data to CSV before purging
+  async exportUserDataToCSV(userId = null) {
+    const targetUserId = userId || this.defaultUserId;
+    const posts = await this.getAllPostsWithRelatedData();
+    
+    if (posts.length === 0) {
+      console.log('📄 No data to export');
+      return null;
+    }
+
+    // Create CSV content
+    const headers = [
+      'post_id', 'short_code', 'post_url', 'owner_username', 'likes_count', 
+      'comments_count', 'video_view_count', 'engagement_rate', 'performance_score',
+      'scraped_at', 'caption', 'hashtags', 'location_name'
+    ];
+    
+    const csvRows = [headers.join(',')];
+    
+    posts.forEach(post => {
+      const row = [
+        post.post_id || '',
+        post.short_code || '',
+        post.post_url || '',
+        post.owner_username || '',
+        post.likes_count || 0,
+        post.comments_count || 0,
+        post.video_view_count || 0,
+        post.engagement_rate || 0,
+        post.performance_score || 0,
+        post.scraped_at || '',
+        (post.caption || '').replace(/"/g, '""').replace(/,/g, ';'),
+        (post.hashtags || []).join(';'),
+        post.location_name || ''
+      ];
+      csvRows.push(row.join(','));
+    });
+    
+    const csvContent = csvRows.join('\n');
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const filename = `informint-export-${timestamp}.csv`;
+    
+    console.log(`📄 Generated CSV export: ${filename} (${posts.length} posts)`);
+    return { filename, content: csvContent, postCount: posts.length };
+  }
+
+  // Safe purge with CSV export
+  async safePurgeWithExport(userId = null) {
+    console.log('🔄 Starting safe purge with CSV export...');
+    
+    // First export data
+    const exportResult = await this.exportUserDataToCSV(userId);
+    
+    if (exportResult) {
+      // Save CSV to scrapes directory
+      const fs = require('fs');
+      const path = require('path');
+      
+      const scrapesDir = path.join(__dirname, 'scrapes');
+      if (!fs.existsSync(scrapesDir)) {
+        fs.mkdirSync(scrapesDir, { recursive: true });
+      }
+      
+      const csvPath = path.join(scrapesDir, exportResult.filename);
+      fs.writeFileSync(csvPath, exportResult.content);
+      
+      console.log(`💾 CSV saved to: ${csvPath}`);
+    }
+    
+    // Then purge user data
+    await this.purgeUserData(userId);
+    
+    return exportResult;
+  }
+
+  // 🚨 DEPRECATED: This function is dangerous and should not be used
+  async deleteAllData() {
+    throw new Error('🚨 SECURITY: deleteAllData is deprecated. Use purgeUserData(userId) instead for user-specific data deletion.');
+  }
+
+  async getStats(userId = null) {
+    const targetUserId = userId || this.defaultUserId;
+    
     const [sessions, posts, comments, taggedUsers] = await Promise.all([
-      this.supabase.from('scrape_sessions').select('id', { count: 'exact' }),
-      this.supabase.from('instagram_posts').select('id', { count: 'exact' }),
+      this.supabase.from('scrape_sessions').select('id', { count: 'exact' }).eq('user_id', targetUserId),
+      this.supabase.from('instagram_posts').select('id', { count: 'exact' }).eq('user_id', targetUserId),
       this.supabase.from('instagram_comments').select('id', { count: 'exact' }),
       this.supabase.from('tagged_users').select('id', { count: 'exact' })
     ]);
@@ -444,7 +568,8 @@ class SupabaseManager {
       totalSessions: sessions.count,
       totalPosts: posts.count,
       totalComments: comments.count,
-      totalTaggedUsers: taggedUsers.count
+      totalTaggedUsers: taggedUsers.count,
+      userId: targetUserId
     };
   }
 }

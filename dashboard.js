@@ -136,19 +136,76 @@ async function loadDashboardData() {
 
 // Dashboard management functions
 function refreshDashboard() {
+  setActiveNavButton('refresh');
   loadDashboardData();
   if (document.getElementById('scrapeManager').style.display !== 'none') {
     loadScrapesList();
   }
+  if (currentView === 'analytics') {
+    loadAnalytics();
+  }
+}
+
+function toggleView(view) {
+  currentView = view;
+  
+  // Update active button
+  setActiveNavButton(view);
+  
+  // Hide all sections
+  document.getElementById('analyticsOverview').style.display = 'none';
+  document.getElementById('dataView').style.display = 'none';
+  document.getElementById('scrapeManager').style.display = 'none';
+  
+  // Show selected section
+  if (view === 'analytics') {
+    document.getElementById('analyticsOverview').style.display = 'block';
+    loadAnalytics();
+  } else if (view === 'data') {
+    document.getElementById('dataView').style.display = 'block';
+    loadDashboardData();
+  }
 }
 
 function toggleScrapeManager() {
+  setActiveNavButton('manage');
+  
+  // Hide other sections
+  document.getElementById('analyticsOverview').style.display = 'none';
+  document.getElementById('dataView').style.display = 'none';
+  
   const manager = document.getElementById('scrapeManager');
   if (manager.style.display === 'none') {
     manager.style.display = 'block';
     loadScrapesList();
   } else {
     manager.style.display = 'none';
+    // Return to analytics view
+    toggleView('analytics');
+  }
+}
+
+function setActiveNavButton(activeButton) {
+  // Remove active class from all nav buttons
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  // Add active class to the appropriate button
+  const buttonMap = {
+    'analytics': 'Analytics',
+    'data': 'View Data',
+    'manage': 'Manage Scrapes',
+    'refresh': 'Refresh'
+  };
+  
+  if (buttonMap[activeButton]) {
+    const buttons = document.querySelectorAll('.nav-btn');
+    buttons.forEach(btn => {
+      if (btn.textContent.trim().includes(buttonMap[activeButton])) {
+        btn.classList.add('active');
+      }
+    });
   }
 }
 
@@ -354,22 +411,46 @@ function downloadDataAsCSV(data, filename) {
 }
 
 function purgeAllScrapes() {
-  if (!confirm('⚠️ Are you sure you want to delete ALL scrapes? This action cannot be undone!')) {
+  if (!confirm('⚠️ Are you sure you want to delete ALL your data?\n\n📄 This will automatically export your data to CSV before purging.\n\n🗑️ This action cannot be undone!')) {
     return;
   }
 
-  fetch(`${getBaseUrl()}/api/scrapes`, {
-    method: 'DELETE'
+  // Show loading state
+  const button = event.target;
+  const originalText = button.innerHTML;
+  button.innerHTML = '<span class="btn-icon">⏳</span>Processing...';
+  button.disabled = true;
+
+  fetch(`${getBaseUrl()}/api/purge-safe`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({}) // Empty body, uses default user
   })
     .then(res => res.json())
     .then(result => {
-      alert(result.message);
-      loadScrapesList();
-      loadDashboardData(); // Refresh main dashboard
+      if (result.success) {
+        alert(`✅ Success!\n\n${result.message}\n\n${result.exported ? `📄 CSV exported: ${result.filename}` : '📄 No data to export'}`);
+        
+        // Refresh all views
+        loadScrapesList();
+        loadDashboardData();
+        if (currentView === 'analytics') {
+          loadAnalytics();
+        }
+      } else {
+        alert(`❌ Error: ${result.error}`);
+      }
     })
     .catch(err => {
-      console.error('Error purging scrapes:', err);
-      alert('Failed to purge scrapes.');
+      console.error('Error during safe purge:', err);
+      alert('❌ Failed to purge data. Please try again or contact support.');
+    })
+    .finally(() => {
+      // Restore button state
+      button.innerHTML = originalText;
+      button.disabled = false;
     });
 }
 
@@ -443,30 +524,6 @@ async function downloadCSVAndPurge() {
 }
 
 // ===== ANALYTICS FUNCTIONALITY =====
-
-// View toggle functionality
-function toggleView(view) {
-  const analyticsView = document.getElementById('analyticsOverview');
-  const dataView = document.getElementById('dataView');
-  const analyticsBtn = document.querySelector('[onclick="toggleView(\'analytics\')"]');
-  const dataBtn = document.querySelector('[onclick="toggleView(\'data\')"]');
-
-  if (view === 'analytics') {
-    analyticsView.style.display = 'block';
-    dataView.style.display = 'none';
-    analyticsBtn?.classList.add('active');
-    dataBtn?.classList.remove('active');
-    currentView = 'analytics';
-    loadAnalytics();
-  } else {
-    analyticsView.style.display = 'none';
-    dataView.style.display = 'block';
-    analyticsBtn?.classList.remove('active');
-    dataBtn?.classList.add('active');
-    currentView = 'data';
-    loadDashboardData();
-  }
-}
 
 // Load analytics data and render dashboard
 async function loadAnalytics() {
@@ -701,28 +758,13 @@ function showAnalyticsError(message) {
   `;
 }
 
-// Enhanced refresh function
-function refreshDashboard() {
-  if (currentView === 'analytics') {
-    loadAnalytics();
-  } else {
-    loadDashboardData();
-  }
-  
-  if (document.getElementById('scrapeManager').style.display !== 'none') {
-    loadScrapesList();
-  }
-}
-
 // Initialize dashboard
-window.addEventListener('DOMContentLoaded', () => {
-  // Set initial view buttons
-  const analyticsBtn = document.querySelector('[onclick="toggleView(\'analytics\')"]');
-  const dataBtn = document.querySelector('[onclick="toggleView(\'data\')"]');
+document.addEventListener('DOMContentLoaded', () => {
+  // Set default view to analytics
+  toggleView('analytics');
   
-  if (analyticsBtn) analyticsBtn.classList.add('active');
-  if (dataBtn) dataBtn.classList.remove('active');
-  
-  // Load analytics by default
+  // Load initial data
   loadAnalytics();
+  
+  console.log('🚀 Dashboard initialized');
 });

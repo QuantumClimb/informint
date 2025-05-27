@@ -76,14 +76,37 @@
 
     <section class="dashboard-header">
       <div class="container">
-        <div class="dashboard-actions">
-          <button class="btn btn-outline" onclick="navigateToNewScrape()">New Scrape</button>
-          <button class="btn btn-outline" onclick="refreshDashboard()">Refresh</button>
-          <button class="btn btn-outline" onclick="toggleView('data')">View Data</button>
-          <button class="btn btn-outline" onclick="toggleView('analytics')">Analytics</button>
-          <button class="btn btn-outline" onclick="toggleScrapeManager()">Manage Scrapes</button>
-          <button class="btn btn-primary" onclick="downloadCSV()">Download All CSV</button>
-          <button class="btn btn-danger" onclick="purgeAllScrapes()">Purge All</button>
+        <div class="dashboard-nav">
+          <div class="nav-buttons">
+            <button class="nav-btn nav-btn-primary" onclick="navigateToNewScrape()">
+              <span class="btn-icon">➕</span>
+              New Scrape
+            </button>
+            <button class="nav-btn" onclick="refreshDashboard()">
+              <span class="btn-icon">🔄</span>
+              Refresh
+            </button>
+            <button class="nav-btn" onclick="toggleView('data')">
+              <span class="btn-icon">📊</span>
+              View Data
+            </button>
+            <button class="nav-btn" onclick="toggleView('analytics')">
+              <span class="btn-icon">📈</span>
+              Analytics
+            </button>
+            <button class="nav-btn" onclick="toggleScrapeManager()">
+              <span class="btn-icon">📋</span>
+              Manage Scrapes
+            </button>
+            <button class="nav-btn nav-btn-secondary" onclick="downloadCSV()">
+              <span class="btn-icon">💾</span>
+              Download All CSV
+            </button>
+            <button class="nav-btn nav-btn-danger" onclick="purgeAllScrapes()">
+              <span class="btn-icon">🗑️</span>
+              Purge All
+            </button>
+          </div>
         </div>
       </div>
     </section>

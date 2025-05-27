@@ -198,8 +198,133 @@ NODE_ENV=development npm run start:supabase
 1. **Authentication**: Implement user login/signup
 2. **Real-time Updates**: Add live dashboard updates
 3. **Advanced Analytics**: Custom SQL queries and reports
-4. **API Rate Limiting**: Implement usage quotas
-5. **Data Export**: CSV/Excel export functionality
+
+---
+
+## 🚨 CRITICAL SECURITY UPDATE (Latest)
+
+### Security Fixes Applied
+
+**Date**: December 2024  
+**Priority**: CRITICAL  
+**Status**: ✅ COMPLETED
+
+#### Issues Identified & Fixed
+
+1. **🚨 Dangerous Global Data Deletion**
+   - **Issue**: `deleteAllData()` function could delete ALL user data across the entire database
+   - **Risk**: Data loss, privacy violations, potential data breaches
+   - **Fix**: Function now throws security error and redirects to user-specific operations
+
+2. **🚨 Missing User Isolation**
+   - **Issue**: All operations were using a single default user ID
+   - **Risk**: Data mixing between users, privacy violations
+   - **Fix**: All operations now support user-specific data isolation
+
+3. **🚨 No Data Export Before Purge**
+   - **Issue**: Data purging without backup/export capability
+   - **Risk**: Permanent data loss
+   - **Fix**: Automatic CSV export before any purge operation
+
+#### Security Improvements
+
+##### ✅ User-Specific Data Operations
+```javascript
+// OLD (DANGEROUS): Deleted ALL data
+await supabaseManager.deleteAllData(); // ❌ BLOCKED
+
+// NEW (SECURE): User-specific operations
+await supabaseManager.purgeUserData(userId);           // ✅ Safe
+await supabaseManager.safePurgeWithExport(userId);     // ✅ Recommended
+await supabaseManager.exportUserDataToCSV(userId);     // ✅ Export only
+```
+
+##### ✅ Secure API Endpoints
+```bash
+# NEW SECURE ENDPOINTS
+POST /api/purge-safe      # Export CSV then purge user data
+POST /api/purge-user      # Purge specific user data only
+GET  /api/export          # Export user data to CSV
+
+# DEPRECATED (BLOCKED)
+POST /api/purge           # ❌ Returns 410 Gone with security warning
+```
+
+##### ✅ Row Level Security (RLS) Re-enabled
+- **User isolation**: Each user can only access their own data
+- **Secure policies**: Proper authentication-based access control
+- **Default user support**: Maintains compatibility during development
+
+##### ✅ CSV Export & Backup
+```javascript
+// Automatic CSV export before purge
+const result = await supabaseManager.safePurgeWithExport();
+// Creates: scrapes/informint-export-2024-12-XX.csv
+```
+
+#### Testing Security Fixes
+
+Run the security test suite:
+```bash
+node test-security-fixes.js
+```
+
+Expected output:
+```
+🔒 Testing Security Fixes...
+✅ SECURITY SUCCESS: deleteAllData properly blocked
+✅ User-specific stats working
+✅ CSV export working
+✅ All security tests passed!
+```
+
+#### Migration Guide
+
+If you have existing code using the old dangerous functions:
+
+```javascript
+// BEFORE (DANGEROUS)
+await supabaseManager.deleteAllData();
+
+// AFTER (SECURE)
+await supabaseManager.safePurgeWithExport(); // Exports CSV first
+// or
+await supabaseManager.purgeUserData(userId); // User-specific only
+```
+
+#### API Usage Examples
+
+```bash
+# Export data to CSV
+curl "http://localhost:3000/api/export"
+
+# Safe purge with automatic CSV export
+curl -X POST "http://localhost:3000/api/purge-safe" \
+  -H "Content-Type: application/json" \
+  -d '{"userId": "optional-user-id"}'
+
+# User-specific purge only
+curl -X POST "http://localhost:3000/api/purge-user" \
+  -H "Content-Type: application/json" \
+  -d '{"userId": "specific-user-id"}'
+```
+
+#### Files Modified
+
+- ✅ `supabase-client.js` - Secure user-specific operations
+- ✅ `index-supabase.js` - New secure API endpoints
+- ✅ `test-security-fixes.js` - Security validation tests
+- ✅ Database RLS policies - Re-enabled with user isolation
+
+#### Verification
+
+1. **Security Test**: `node test-security-fixes.js`
+2. **Database Status**: `curl http://localhost:3000/api/status`
+3. **Export Test**: `curl http://localhost:3000/api/export`
+
+---
+
+**⚠️ IMPORTANT**: These security fixes are critical for production deployment. The old `deleteAllData()` function has been permanently disabled to prevent accidental data loss.
 
 ## 📞 Support
 

@@ -589,6 +589,99 @@ app.get('/api/status', async (req, res) => {
   }
 });
 
+// ===== SECURE PURGE ENDPOINTS =====
+
+// Export user data to CSV
+app.get('/api/export', async (req, res) => {
+  try {
+    const userId = req.query.userId; // Optional user ID parameter
+    const exportResult = await supabaseManager.exportUserDataToCSV(userId);
+    
+    if (!exportResult) {
+      return res.json({
+        success: false,
+        message: 'No data to export',
+        postCount: 0
+      });
+    }
+    
+    res.json({
+      success: true,
+      filename: exportResult.filename,
+      postCount: exportResult.postCount,
+      message: `Exported ${exportResult.postCount} posts to CSV`
+    });
+  } catch (error) {
+    console.error('❌ Export error:', error);
+    res.status(500).json({ 
+      success: false,
+      error: error.message 
+    });
+  }
+});
+
+// Safe purge with CSV export (recommended)
+app.post('/api/purge-safe', async (req, res) => {
+  try {
+    const userId = req.body.userId; // Optional user ID parameter
+    console.log('🔄 Starting safe purge with CSV export...');
+    
+    const result = await supabaseManager.safePurgeWithExport(userId);
+    
+    res.json({
+      success: true,
+      exported: result ? true : false,
+      filename: result ? result.filename : null,
+      postCount: result ? result.postCount : 0,
+      message: result 
+        ? `Successfully exported ${result.postCount} posts to CSV and purged user data`
+        : 'No data to export, purge completed'
+    });
+  } catch (error) {
+    console.error('❌ Safe purge error:', error);
+    res.status(500).json({ 
+      success: false,
+      error: error.message 
+    });
+  }
+});
+
+// User-specific purge (without export)
+app.post('/api/purge-user', async (req, res) => {
+  try {
+    const userId = req.body.userId; // Optional user ID parameter
+    console.log(`🗑️ Starting user-specific purge for user: ${userId || 'default'}`);
+    
+    await supabaseManager.purgeUserData(userId);
+    
+    res.json({
+      success: true,
+      message: `Successfully purged data for user: ${userId || 'default'}`
+    });
+  } catch (error) {
+    console.error('❌ User purge error:', error);
+    res.status(500).json({ 
+      success: false,
+      error: error.message 
+    });
+  }
+});
+
+// ===== DEPRECATED ENDPOINTS =====
+
+// Legacy purge endpoint (now secured)
+app.post('/api/purge', async (req, res) => {
+  res.status(410).json({
+    success: false,
+    error: '🚨 SECURITY: This endpoint is deprecated for security reasons. Use /api/purge-safe or /api/purge-user instead.',
+    alternatives: {
+      safePurge: '/api/purge-safe (exports CSV then purges)',
+      userPurge: '/api/purge-user (purges specific user data)',
+      export: '/api/export (export only, no purge)'
+    }
+  });
+});
+
 // Initialize server
 function startServer() {
   app.listen(port, () => {
