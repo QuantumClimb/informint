@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    }
+  ],
+  "env": {
+    "APIFY_TOKEN": "@apify_token",
+    "APIFY_ACTOR_ID": "@apify_actor_id",
+    "NEON_URL": "@neon_url",
+    "NEON_ANON_KEY": "@neon_anon_key",
+    "NEON_SERVICE_ROLE_KEY": "@neon_service_role_key"
+  }
+}
