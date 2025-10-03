@@ -11,6 +11,10 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# Ignore environment files containing secrets
+.env
+.env.local
+
 # Runtime data
 pids
 *.pid
@@ -65,4 +69,4 @@ coverage/
 *.tgz
 
 # Yarn Integrity file
-.yarn-integrity 
+.yarn-integrity
