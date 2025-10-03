@@ -20,15 +20,28 @@ export default async function handler(req, res) {
         return;
     }
 
-    if (req.method !== 'POST') {
+    if (req.method !== 'POST' && req.method !== 'GET') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
     try {
-        const { urls, userId } = req.body;
+        let urls, userId;
 
-        if (!urls || !Array.isArray(urls) || urls.length === 0) {
-            return res.status(400).json({ error: 'URLs array is required' });
+        // Handle both GET and POST requests
+        if (req.method === 'GET') {
+            // For GET requests, extract URL from query parameters
+            const { url } = req.query;
+            if (!url) {
+                return res.status(400).json({ error: 'URL parameter is required' });
+            }
+            urls = [url];
+            userId = req.query.userId || 'anonymous';
+        } else {
+            // For POST requests, extract from body
+            ({ urls, userId } = req.body);
+            if (!urls || !Array.isArray(urls) || urls.length === 0) {
+                return res.status(400).json({ error: 'URLs array is required' });
+            }
         }
 
         if (urls.length > 3) {
